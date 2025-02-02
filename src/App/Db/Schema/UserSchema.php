@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\JoinTable;
 use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\Table;
@@ -72,6 +73,14 @@ class UserSchema implements JsonSerializable
   #[ManyToMany(targetEntity: CommentSchema::class, mappedBy: 'signals')]
   private Collection $signaled;
 
+  // articles
+
+  #[OneToMany(targetEntity: ArticleSchema::class, mappedBy: 'author')]
+  private Collection $articles;
+
+  #[ManyToMany(targetEntity: ArticleSchema::class, mappedBy: 'likes')]
+  private Collection $likeBlogs;
+
   #[Column(name: "created_at", type: 'datetimetz_immutable', nullable: false)]
   private DateTimeImmutable $createdAt;
 
@@ -93,6 +102,8 @@ class UserSchema implements JsonSerializable
     $this->comments = new ArrayCollection();
     $this->liked = new ArrayCollection();
     $this->signaled = new ArrayCollection();
+    $this->articles = new ArrayCollection();
+    $this->likeBlogs = new ArrayCollection();
     $this->createdAt = new DateTimeImmutable('now');
     $this->updatedAt = new DateTimeImmutable('now');
   }
@@ -185,6 +196,16 @@ class UserSchema implements JsonSerializable
     return $this->signaled;
   }
 
+  public function getLikedBlogs(): Collection
+  {
+    return $this->likeBlogs;
+  }
+
+  public function getArticles(): Collection
+  {
+    return $this->articles;
+  }
+
   public function getCreatedAt(): DateTimeImmutable
   {
     return $this->createdAt;
@@ -243,7 +264,6 @@ class UserSchema implements JsonSerializable
   public function addComment(CommentSchema $comment): void
   {
     $this->comments->add($comment);
-    $comment->setAuthor($this);
   }
 
   public function setUpdatedAt(DateTimeImmutable $updatedAt): void

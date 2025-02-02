@@ -31,7 +31,7 @@ class CommentController
     return $response;
   }
 
-  public function create(Request $request, Response $response): Response
+  public function create(Request $request, Response $response, string $article_id): Response
   {
     $data = $request->getParsedBody();
 
@@ -41,9 +41,10 @@ class CommentController
       return $response->withStatus(422);
     }
 
-    $user = $this->userService->findById((int)$data['user_id']);
+    $user = $request->getAttribute('author');
+    $article = $request->getAttribute('article');
 
-    $comment = $this->commentService->create($user, $data);
+    $comment = $this->commentService->create($user, $article, $data);
     $response->getBody()->write(json_encode($comment));
     return $response;
   }
@@ -56,10 +57,11 @@ class CommentController
     return $response;
   }
 
-  public function responseComment(Request $request, Response $response, string $id): Response
+  public function responseComment(Request $request, Response $response, string $article_id, string $id): Response
   {
     $parentComment = $request->getAttribute('parentComment');
     $author = $request->getAttribute('author');
+    $article = $request->getAttribute('article');
     $data = $request->getParsedBody();
 
     $this->validator = $this->validator->withData($data);
@@ -68,7 +70,7 @@ class CommentController
       return $response->withStatus(422);
     }
 
-    $comment = $this->commentService->reponseToComment($author, $parentComment, $data);
+    $comment = $this->commentService->reponseToComment($author, $parentComment, $article, $data);
 
     $response->getBody()->write(json_encode($comment));
     return $response;
@@ -76,7 +78,7 @@ class CommentController
   }
 
   // like comments
-  public function likeComment(Request $request, Response $response, string $comment_id, string $id): Response
+  public function likeComment(Request $request, Response $response, string $comment_id): Response
   {
     $user = $request->getAttribute('user');
     $comment = $request->getAttribute('comment');
@@ -85,7 +87,7 @@ class CommentController
     return $response;
   }
 
-  public function unlikeComment(Request $request, Response $response, string $comment_id, string $id): Response
+  public function unlikeComment(Request $request, Response $response, string $comment_id): Response
   {
     $user = $request->getAttribute('user');
     $comment = $request->getAttribute('comment');
@@ -95,7 +97,7 @@ class CommentController
   }
 
   //signal comments
-  public function signalComment(Request $request, Response $response, string $comment_id, string $id): Response
+  public function signalComment(Request $request, Response $response, string $comment_id): Response
   {
     $user = $request->getAttribute('user');
     $comment = $request->getAttribute('comment');
@@ -104,7 +106,7 @@ class CommentController
     return $response;
   }
 
-  public function unsignalComment(Request $request, Response $response, string $comment_id, string $id): Response
+  public function unsignalComment(Request $request, Response $response, string $comment_id): Response
   {
     $user = $request->getAttribute('user');
     $comment = $request->getAttribute('comment');

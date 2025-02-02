@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Db\Repository;
 
+use App\Db\Schema\ArticleSchema;
 use App\Db\Schema\CommentSchema;
 use Doctrine\ORM\EntityManager;
 use App\Db\Schema\UserSchema;
@@ -15,11 +18,9 @@ final class CommentService
     $this->em = $em;
   }
 
-  public function create(UserSchema $user, array $data): CommentSchema
+  public function create(UserSchema $user, ArticleSchema $article, array $data): CommentSchema
   {
-    $comment = new CommentSchema($data);
-    $comment->setAuthor($user);
-    $user->getComments()->add($comment);
+    $comment = new CommentSchema($user, $article, $data);
     $this->em->persist($comment);
     $this->em->flush();
     $this->em->refresh($comment);
@@ -69,9 +70,9 @@ final class CommentService
   //   return $comment;
   // }
 
-  public function reponseToComment(UserSchema $author, CommentSchema $parentComment, array $comment): CommentSchema
+  public function reponseToComment(UserSchema $author, CommentSchema $parentComment, ArticleSchema $article, array $comment): CommentSchema
   {
-    $comment = $this->create($author, $comment);
+    $comment = $this->create($author, $article, $comment);
     $parentComment->addRespond($comment);
     $author->addComment($comment);
     $this->em->flush();

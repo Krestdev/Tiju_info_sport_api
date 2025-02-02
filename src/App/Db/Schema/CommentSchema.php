@@ -58,38 +58,37 @@ class CommentSchema implements JsonSerializable
   #[JoinTable(name: 'users_signals')]
   private Collection $signals;
 
+  // Many comment belongs to an article
+  #[ManyToOne(targetEntity: ArticleSchema::class, inversedBy: 'comments')]
+  private ArticleSchema|null $article = null;
+
   #[Column(name: "created_at", type: 'datetimetz_immutable', nullable: false)]
   private DateTimeImmutable $createdAt;
 
   #[Column(name: "updated_at", type: 'datetimetz_immutable', nullable: false)]
   private DateTimeImmutable $updatedAt;
 
-  public function __construct(array $data)
+  public function __construct(UserSchema $author, ArticleSchema $article, array $data)
   {
+    $this->author = $author;
+    $this->article = $article;
     $this->message = $data['message'];
     $this->likes = new ArrayCollection();
     $this->response = new ArrayCollection();
     $this->signals = new ArrayCollection();
     $this->createdAt = new DateTimeImmutable('now');
     $this->updatedAt = new DateTimeImmutable('now');
+
+    $author->getComments()->add($this);
+    $article->getComments()->add($this);
   }
 
   public function jsonSerialize(): array
   {
-    if ($this->response instanceof PersistentCollection) {
-      $this->response->initialize();
-    }
-    if ($this->likes instanceof PersistentCollection) {
-      $this->likes->initialize();
-    }
-    if ($this->signals instanceof PersistentCollection) {
-      $this->signals->initialize();
-    }
-
     return [
       'id' => $this->id,
       'author' => $this->author,
-      'children' => $this->response,
+      'article_id' => $this->article->getId(),
       'message' => $this->message,
       'likes' => $this->likes->count(),
       'response' => $this->response->toArray(),
@@ -108,10 +107,12 @@ class CommentSchema implements JsonSerializable
   {
     return $this->message;
   }
+
   public function getResponse(): Collection
   {
     return $this->response;
   }
+
   public function getParent(): CommentSchema
   {
     if (! isset($this->parent)) {
@@ -119,14 +120,21 @@ class CommentSchema implements JsonSerializable
     }
     return $this->parent;
   }
+
   public function getLiks(): Collection
   {
     return $this->likes;
   }
+
   public function getSignals(): Collection
   {
     return $this->signals;
   }
+  public function getArticle(): ArticleSchema
+  {
+    return $this->article;
+  }
+
   public function getUpdatedAt(): DateTimeImmutable
   {
     return $this->updatedAt;
@@ -140,12 +148,6 @@ class CommentSchema implements JsonSerializable
   public function getAuthor(): ?UserSchema
   {
     return $this->author;
-  }
-
-  public function setAuthor(UserSchema $author): void
-  {
-    $this->author = $author;
-    $author->getComments()->add($this);
   }
 
   public function setParent(CommentSchema $parent): void
@@ -194,6 +196,8 @@ class CommentSchema implements JsonSerializable
       $user->getSignaled()->removeElement($this);
     }
   }
+
+  // handle articles
 
   public function setMessage(string $message): void
   {

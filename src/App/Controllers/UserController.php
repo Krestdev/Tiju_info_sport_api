@@ -28,7 +28,7 @@ class UserController
     ]);
   }
 
-  public function show(Request $request, Response $response, string $id): Response
+  public function show(Request $request, Response $response, string $user_id): Response
   {
     $user = $request->getAttribute('user');
     $response->getBody()->write(json_encode($user));
@@ -99,7 +99,7 @@ class UserController
    * @param string $id
    * @return Response
    */
-  public function edit(Request $request, Response $response, string $id): Response
+  public function edit(Request $request, Response $response, string $user_id): Response
   {
     $data = $request->getParsedBody();
 
@@ -110,14 +110,14 @@ class UserController
       return $response->withStatus(422);
     }
 
-    $user = $this->userService->update((int)$id, $data);
+    $user = $this->userService->update((int)$user_id, $data);
     $response->getBody()->write(json_encode($user));
     return $response;
   }
 
-  public function delete(Request $request, Response $response, string $id): Response
+  public function delete(Request $request, Response $response, string $user_id): Response
   {
-    $user = $this->userService->delete((int)$id);
+    $user = $this->userService->delete((int)$user_id);
     $response->getBody()->write(json_encode($user));
     return $response;
   }
