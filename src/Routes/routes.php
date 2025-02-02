@@ -5,10 +5,11 @@ declare(strict_types=1);
 use App\Controllers\CommentController;
 use App\Controllers\UserController;
 use App\Controllers\UserIndex;
-use App\Middleware\GetComment;
-use App\Middleware\GetCommentAuthor;
+use App\Middleware\Comment\GetComment;
+use App\Middleware\Comment\GetCommentAuthor;
+use App\Middleware\Comment\GetParentComment;
 use Slim\Routing\RouteCollectorProxy;
-use App\Middleware\GetUser;
+use App\Middleware\User\GetUser;
 
 
 $app->group('/api', function (RouteCollectorProxy $group) {
@@ -28,7 +29,17 @@ $app->group('/api', function (RouteCollectorProxy $group) {
   // Comments Routes
 
   $group->post('/comments', [CommentController::class, 'create'])->add(GetCommentAuthor::class);
-  $group->get('/comments/{id:[0-9]+}', [CommentController::class, 'show'])->add(GetComment::class);
-  $group->patch('/comments/{id:[0-9]+}', [CommentController::class, 'update'])->add(GetComment::class);
-  $group->delete('/comments/{id:[0-9]+}', [CommentController::class, 'delete'])->add(GetComment::class);
+  $group->post('/comments/{id:[0-9]+}', [CommentController::class, 'responseComment'])->add(GetParentComment::class)->add(GetCommentAuthor::class);
+  $group->get('/comments/{comment_id:[0-9]+}', [CommentController::class, 'show'])->add(GetComment::class);
+
+  // Comment likes
+  $group->get('/comments/like/{comment_id:[0-9]+}/{id:[0-9]+}', [CommentController::class, 'likeComment'])->add(GetComment::class)->add(GetUser::class);
+  $group->get('/comments/unlike/{comment_id:[0-9]+}/{id:[0-9]+}', [CommentController::class, 'unlikeComment'])->add(GetComment::class)->add(GetUser::class);
+
+  // Comment signals
+  $group->get('/comments/signal/{comment_id:[0-9]+}/{id:[0-9]+}', [CommentController::class, 'signalComment'])->add(GetComment::class)->add(GetUser::class);
+  $group->get('/comments/unsignal/{comment_id:[0-9]+}/{id:[0-9]+}', [CommentController::class, 'unsignalComment'])->add(GetComment::class)->add(GetUser::class);
+
+  $group->patch('/comments/{comment_id:[0-9]+}', [CommentController::class, 'update'])->add(GetComment::class);
+  $group->delete('/comments/{comment_id:[0-9]+}', [CommentController::class, 'delete'])->add(GetComment::class);
 });

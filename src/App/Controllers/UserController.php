@@ -118,14 +118,7 @@ class UserController
   public function delete(Request $request, Response $response, string $id): Response
   {
     $user = $this->userService->delete((int)$id);
-    $body = json_encode([
-      'message' => 'User deleted successfully',
-      'user' => [
-        "email" => $user->getEmail(),
-        "createdAt" => $user->getCreatedAtFormatted()
-      ]
-    ]);
-    $response->getBody()->write($body);
+    $response->getBody()->write(json_encode($user));
     return $response;
   }
 }

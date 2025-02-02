@@ -24,7 +24,7 @@ class CommentController
     ]);
   }
 
-  public function show(Request $request, Response $response, string $id): Response
+  public function show(Request $request, Response $response, string $comment_id): Response
   {
     $comment = $request->getAttribute('comment');
     $response->getBody()->write(json_encode($comment));
@@ -48,17 +48,74 @@ class CommentController
     return $response;
   }
 
-  public function update(Request $request, Response $response, string $id): Response
+  public function update(Request $request, Response $response, string $comment_id): Response
   {
     $data = $request->getParsedBody();
-    $comment = $this->commentService->update((int)$id, $data);
+    $comment = $this->commentService->update((int)$comment_id, $data);
     $response->getBody()->write(json_encode($comment));
     return $response;
   }
 
-  public function delete(Request $request, Response $response, string $id): Response
+  public function responseComment(Request $request, Response $response, string $id): Response
   {
-    $comment = $this->commentService->delete((int)$id);
+    $parentComment = $request->getAttribute('parentComment');
+    $author = $request->getAttribute('author');
+    $data = $request->getParsedBody();
+
+    $this->validator = $this->validator->withData($data);
+    if (!$this->validator->validate()) {
+      $response->getBody()->write(json_encode($this->validator->errors()));
+      return $response->withStatus(422);
+    }
+
+    $comment = $this->commentService->reponseToComment($author, $parentComment, $data);
+
+    $response->getBody()->write(json_encode($comment));
+    return $response;
+    // $comment = $this->commentService->reponseToComment()
+  }
+
+  // like comments
+  public function likeComment(Request $request, Response $response, string $comment_id, string $id): Response
+  {
+    $user = $request->getAttribute('user');
+    $comment = $request->getAttribute('comment');
+    $comment = $this->commentService->likeComment($user, $comment);
+    $response->getBody()->write(json_encode($comment));
+    return $response;
+  }
+
+  public function unlikeComment(Request $request, Response $response, string $comment_id, string $id): Response
+  {
+    $user = $request->getAttribute('user');
+    $comment = $request->getAttribute('comment');
+    $comment = $this->commentService->unlikeComment($user, $comment);
+    $response->getBody()->write(json_encode($comment));
+    return $response;
+  }
+
+  //signal comments
+  public function signalComment(Request $request, Response $response, string $comment_id, string $id): Response
+  {
+    $user = $request->getAttribute('user');
+    $comment = $request->getAttribute('comment');
+    $comment = $this->commentService->signalComment($user, $comment);
+    $response->getBody()->write(json_encode($comment));
+    return $response;
+  }
+
+  public function unsignalComment(Request $request, Response $response, string $comment_id, string $id): Response
+  {
+    $user = $request->getAttribute('user');
+    $comment = $request->getAttribute('comment');
+    $comment = $this->commentService->unsignalComment($user, $comment);
+    $response->getBody()->write(json_encode($comment));
+    return $response;
+  }
+
+  public function delete(Request $request, Response $response, string $comment_id): Response
+  {
+    $comment = $this->commentService->delete((int)$comment_id);
     $response->getBody()->write(json_encode($comment));
     return $response;
   }

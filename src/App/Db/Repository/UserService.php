@@ -66,13 +66,15 @@ final class UserService
     return $this->em->getRepository(UserSchema::class)->findAll();
   }
 
-  public function delete(int $id): ?UserSchema
+  public function delete(int $id): ?array
   {
     $user = $this->em->getRepository(UserSchema::class)->findOneBy(['id' => $id]);
+    $userData = null;
     if ($user) {
+      $userData = $user->jsonSerialize();
       $this->em->remove($user);
       $this->em->flush();
     }
-    return $user;
+    return $userData;
   }
 }

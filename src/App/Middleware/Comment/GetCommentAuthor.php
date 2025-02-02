@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Middleware;
+namespace App\Middleware\Comment;
 
 use App\Db\Repository\CommentService;
 use App\Db\Repository\UserService;

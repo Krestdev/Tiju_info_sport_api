@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\Table;
+use Doctrine\ORM\PersistentCollection;
 use InvalidArgumentException;
 use JsonSerializable;
 
@@ -75,14 +76,32 @@ class CommentSchema implements JsonSerializable
 
   public function jsonSerialize(): array
   {
+    if ($this->response instanceof PersistentCollection) {
+      $this->response->initialize();
+    }
+    if ($this->likes instanceof PersistentCollection) {
+      $this->likes->initialize();
+    }
+    if ($this->signals instanceof PersistentCollection) {
+      $this->signals->initialize();
+    }
+
     return [
+      'id' => $this->id,
+      'author' => $this->author,
+      'children' => $this->response,
       'message' => $this->message,
-      'likes' => $this->likes,
-      'response' => $this->response,
-      'signals' => $this->signals,
+      'likes' => $this->likes->count(),
+      'response' => $this->response->toArray(),
+      'signals' => $this->signals->count(),
       'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
       'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
     ];
+  }
+
+  public function getId(): int
+  {
+    return $this->id;
   }
 
   public function getMessage(): string
@@ -96,7 +115,7 @@ class CommentSchema implements JsonSerializable
   public function getParent(): CommentSchema
   {
     if (! isset($this->parent)) {
-      throw new InvalidArgumentException("No parent foind");
+      throw new InvalidArgumentException("No parent found");
     }
     return $this->parent;
   }
@@ -126,6 +145,54 @@ class CommentSchema implements JsonSerializable
   public function setAuthor(UserSchema $author): void
   {
     $this->author = $author;
+    $author->getComments()->add($this);
+  }
+
+  public function setParent(CommentSchema $parent): void
+  {
+    $this->parent = $parent;
+    $parent->getResponse()->add($this);
+  }
+
+  // handle response
+  public function addRespond(CommentSchema $response): void
+  {
+    $this->response->add($response);
+    $response->setParent($this);
+  }
+
+  // handle likes
+  public function addLikes(UserSchema $user): void
+  {
+    if (!$this->likes->contains($user)) {
+      $this->likes->add($user);
+      $user->getLiked()->add($this);
+    }
+  }
+
+  public function removeLikes(UserSchema $user): void
+  {
+    if ($this->likes->contains($user)) {
+      $this->likes->removeElement($user);
+      $user->getLiked()->removeElement($this);
+    }
+  }
+
+  // handle signals
+  public function addSignales(UserSchema $user): void
+  {
+    if (!$this->signals->contains($user)) {
+      $this->signals->add($user);
+      $user->getSignaled()->add($this);
+    }
+  }
+
+  public function removeSignales(UserSchema $user): void
+  {
+    if ($this->signals->contains($user)) {
+      $this->signals->removeElement($user);
+      $user->getSignaled()->removeElement($this);
+    }
   }
 
   public function setMessage(string $message): void

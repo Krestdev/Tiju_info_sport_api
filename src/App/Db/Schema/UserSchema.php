@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\Table;
+use Doctrine\ORM\PersistentCollection;
 use JsonSerializable;
 
 #[Entity, Table(name: 'users')]
@@ -52,7 +53,7 @@ class UserSchema implements JsonSerializable
 
   /**
    * A user has many comments
-   * @var Collection<int, UserSchema>
+   * @var Collection<int, CommentSchema>
    */
   #[OneToMany(targetEntity: CommentSchema::class, mappedBy: 'author')]
   private Collection $comments;
@@ -97,6 +98,9 @@ class UserSchema implements JsonSerializable
   }
   public function jsonSerialize(): array
   {
+    // if ($this->comments instanceof PersistentCollection) {
+    //   $this->comments->initialize();
+    // }
     return [
       'id' => $this->id,
       'name' => $this->name,
@@ -108,6 +112,9 @@ class UserSchema implements JsonSerializable
       'country' => $this->country,
       'photo' => $this->photo,
       'role' => $this->role,
+      // 'comments' => $this->comments->toArray(),
+      'liked' => $this->liked,
+      'signals' => $this->signaled,
       'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
       'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s')
     ];
@@ -231,6 +238,12 @@ class UserSchema implements JsonSerializable
   public function setRole(string $role): void
   {
     $this->role = $role;
+  }
+
+  public function addComment(CommentSchema $comment): void
+  {
+    $this->comments->add($comment);
+    $comment->setAuthor($this);
   }
 
   public function setUpdatedAt(DateTimeImmutable $updatedAt): void
