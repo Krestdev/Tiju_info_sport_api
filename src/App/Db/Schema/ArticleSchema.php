@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\JoinTable;
 use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\ManyToOne;
@@ -38,7 +39,7 @@ class ArticleSchema implements JsonSerializable
   private string $description;
   // private string $media: string[],
 
-  #[OneToMany(targetEntity: CommentSchema::class, mappedBy: 'article')]
+  #[OneToMany(targetEntity: CommentSchema::class, mappedBy: 'article', cascade: ['persist', 'remove'], orphanRemoval: true)]
   private Collection $comments;
 
   #[ManyToMany(targetEntity: UserSchema::class, inversedBy: 'likeBlogs')]
@@ -48,6 +49,10 @@ class ArticleSchema implements JsonSerializable
   #[ManyToOne(targetEntity: UserSchema::class, inversedBy: 'articles')]
   private UserSchema|null $author = null;
 
+  #[ManyToOne(targetEntity: CategorySchema::class, inversedBy: 'articles')]
+  #[JoinColumn(name: 'category_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+  private CategorySchema|null $category = null;
+
   #[Column(name: "created_at", type: 'datetimetz_immutable', nullable: false)]
   private DateTimeImmutable $createdAt;
 
@@ -55,19 +60,21 @@ class ArticleSchema implements JsonSerializable
   private DateTimeImmutable $updatedAt;
   // private string $abonArticle: Abonnement
 
-  public function __construct(UserSchema $user, array $data)
+  public function __construct(UserSchema $user, CategorySchema $category, array $data)
   {
     $this->author = $user;
     $this->title = $data['title'];
     $this->type = $data['type'];
     $this->summary = $data['summary'];
     $this->description = $data['description'];
+    $this->category = $category;
     $this->createdAt = new DateTimeImmutable('now');
     $this->updatedAt = new DateTimeImmutable('now');
     $this->comments = new ArrayCollection();
     $this->likes = new ArrayCollection();
 
-    $user->getArticles()->add($this);
+    $user->addArticles($this);
+    $category->addArticle($this);
   }
 
   public function jsonSerialize(): array
@@ -80,6 +87,21 @@ class ArticleSchema implements JsonSerializable
       'description' => $this->description,
       'author' => $this->author,
       'comments' => $this->comments->toArray(),
+      'likes' => $this->likes->count(),
+      'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
+      'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
+    ];
+  }
+
+  public function jsonSerializeDeleted(): array
+  {
+    return [
+      'id' => $this->id,
+      'type' => $this->type,
+      'title' => $this->title,
+      'summery' => $this->summary,
+      'description' => $this->description,
+      'author' => $this->author,
       'likes' => $this->likes->count(),
       'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
       'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
@@ -171,5 +193,10 @@ class ArticleSchema implements JsonSerializable
       $this->likes->removeElement($user);
       $user->getLikedBlogs()->removeElement($this);
     }
+  }
+
+  public function setCategory(CategorySchema $category): void
+  {
+    $this->category = $category;
   }
 };

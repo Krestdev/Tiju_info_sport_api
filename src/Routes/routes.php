@@ -3,18 +3,20 @@
 declare(strict_types=1);
 
 use App\Controllers\ArticleController;
+use App\Controllers\CategoryController;
 use App\Controllers\CommentController;
 use App\Controllers\UserController;
 use App\Controllers\UserIndex;
 use App\Middleware\Articles\GetArticle;
 use App\Middleware\Articles\GetArticleAuthor;
+use App\Middleware\Category\GetCategory;
+use App\Middleware\Category\GetCategoryAuthor as CategoryGetCategoryAuthor;
 use App\Middleware\Comment\GetComment;
 use App\Middleware\Comment\GetCommentAuthor;
 use App\Middleware\Comment\GetParentComment;
 use App\Middleware\Comment\IdentifyUser;
 use Slim\Routing\RouteCollectorProxy;
 use App\Middleware\User\GetUser;
-use Doctrine\DBAL\Schema\Identifier;
 
 $app->group('/api', function (RouteCollectorProxy $group) {
 
@@ -55,12 +57,25 @@ $app->group('/api', function (RouteCollectorProxy $group) {
 
   // Article Routes
 
-  $group->get('/articles/{article_id:[0-9]+}', [ArticleController::class, 'show'])->add(GetArticle::class);
   $group->post('/articles', [ArticleController::class, 'create'])->add(GetArticleAuthor::class);
-  $group->patch('/articles/{article_id:[0-9]+}', [ArticleController::class, 'update'])->add(GetArticle::class);
-  $group->delete('/articles/{article_id:[0-9]+}', [ArticleController::class, 'delete'])->add(GetArticle::class);
 
-  // Article likes
-  $group->patch('/articles/like/{article_id:[0-9]+}', [ArticleController::class, 'likeArticle'])->add(GetArticle::class)->add(IdentifyUser::class);
-  $group->patch('/articles/unlike/{article_id:[0-9]+}', [ArticleController::class, 'unlikeArticle'])->add(GetArticle::class)->add(IdentifyUser::class);
+  $group->group('/articles', function (RouteCollectorProxy $group) {
+    $group->get('/{article_id:[0-9]+}', [ArticleController::class, 'show']);
+    $group->patch('/{article_id:[0-9]+}', [ArticleController::class, 'update']);
+    $group->delete('/{article_id:[0-9]+}', [ArticleController::class, 'delete']);
+
+    // Article likes
+    $group->group('', function (RouteCollectorProxy $group) {
+      $group->patch('/like/{article_id:[0-9]+}', [ArticleController::class, 'likeArticle']);
+      $group->patch('/unlike/{article_id:[0-9]+}', [ArticleController::class, 'unlikeArticle']);
+    })->add(IdentifyUser::class);
+  })->add(GetArticle::class);
+
+  // Category Routes
+
+  $group->get('/category', [CategoryController::class, 'showAll']);
+  $group->post('/category', [CategoryController::class, 'create'])->add(CategoryGetCategoryAuthor::class);
+  $group->get('/category/{category_id:[0-9]+}', [CategoryController::class, 'show'])->add(GetCategory::class); // needs get category MW
+  $group->patch('/category/{category_id:[0-9]+}', [CategoryController::class, 'update'])->add(GetCategory::class); // needs get category MW
+  $group->delete('/category/{category_id:[0-9]+}', [CategoryController::class, 'delete'])->add(GetCategory::class); // needs get category MW
 });

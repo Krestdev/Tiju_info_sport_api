@@ -19,7 +19,15 @@ class ArticleController
       'summary' => ['required', ['lengthMin', 2]],
       'description' => ['required', ['lengthMin', 2]],
       'type' => ['required', ['lengthMin', 2]],
+      'user_id' => ['required', ['lengthMin', 1]],
     ]);
+  }
+
+  public function showAll(Request $request, Response $response, array $args): Response
+  {
+    $articles = $this->articleService->readAll();
+    $response->getBody()->write(json_encode($articles));
+    return $response;
   }
 
   public function show(Request $request, Response $response, string $article_id): Response
@@ -40,8 +48,9 @@ class ArticleController
     }
 
     $user = $request->getAttribute('author');
+    $category = $request->getAttribute('category');
 
-    $article = $this->articleService->create($user, $data);
+    $article = $this->articleService->create($user, $category, $data);
     $response->getBody()->write(json_encode($article));
     return $response;
   }

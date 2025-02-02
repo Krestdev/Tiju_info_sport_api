@@ -20,6 +20,7 @@ class CommentController
   {
     $this->validator->mapFieldsRules([
       'user_id' => ['required', ['lengthMin', 1]],
+      'article_id' => ['required', ['lengthMin', 1]],
       'message' => ['required', ['lengthMin', 1]]
     ]);
   }

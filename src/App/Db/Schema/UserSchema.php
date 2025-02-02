@@ -81,6 +81,11 @@ class UserSchema implements JsonSerializable
   #[ManyToMany(targetEntity: ArticleSchema::class, mappedBy: 'likes')]
   private Collection $likeBlogs;
 
+  // categories
+
+  #[OneToMany(targetEntity: CategorySchema::class, mappedBy: 'author')]
+  private Collection $categories;
+
   #[Column(name: "created_at", type: 'datetimetz_immutable', nullable: false)]
   private DateTimeImmutable $createdAt;
 
@@ -104,6 +109,7 @@ class UserSchema implements JsonSerializable
     $this->signaled = new ArrayCollection();
     $this->articles = new ArrayCollection();
     $this->likeBlogs = new ArrayCollection();
+    $this->categories = new ArrayCollection();
     $this->createdAt = new DateTimeImmutable('now');
     $this->updatedAt = new DateTimeImmutable('now');
   }
@@ -124,8 +130,8 @@ class UserSchema implements JsonSerializable
       'photo' => $this->photo,
       'role' => $this->role,
       // 'comments' => $this->comments->toArray(),
-      'liked' => $this->liked,
-      'signals' => $this->signaled,
+      'liked' => $this->liked->count(),
+      'signals' => $this->signaled->count(),
       'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
       'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s')
     ];
@@ -206,6 +212,11 @@ class UserSchema implements JsonSerializable
     return $this->articles;
   }
 
+  public function getCategories(): Collection
+  {
+    return $this->categories;
+  }
+
   public function getCreatedAt(): DateTimeImmutable
   {
     return $this->createdAt;
@@ -264,6 +275,16 @@ class UserSchema implements JsonSerializable
   public function addComment(CommentSchema $comment): void
   {
     $this->comments->add($comment);
+  }
+
+  public function addArticles(ArticleSchema $article): void
+  {
+    $this->articles->add($article);
+  }
+
+  public function addCategories(CategorySchema $article): void
+  {
+    $this->categories->add($article);
   }
 
   public function setUpdatedAt(DateTimeImmutable $updatedAt): void

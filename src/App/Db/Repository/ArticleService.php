@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Db\Repository;
 
 use App\Db\Schema\ArticleSchema;
+use App\Db\Schema\CategorySchema;
 use App\Db\Schema\UserSchema;
 use Doctrine\ORM\EntityManager;
 
@@ -17,9 +18,14 @@ final class ArticleService
     $this->em = $em;
   }
 
-  public function create(UserSchema $user, array $data): ArticleSchema
+  public function readAll(): array
   {
-    $article = new ArticleSchema($user, $data);
+    return $this->em->getRepository(ArticleSchema::class)->findAll();
+  }
+
+  public function create(UserSchema $user, CategorySchema $category, array $data): ArticleSchema
+  {
+    $article = new ArticleSchema($user, $category, $data);
     $this->em->persist($article);
     $this->em->flush();
     return $article;
@@ -43,7 +49,7 @@ final class ArticleService
   public function delete(int $id): ?array
   {
     $article = $this->em->getRepository(ArticleSchema::class)->findOneBy(["id" => $id]);
-    $articleData = $article->jsonSerialize();
+    $articleData = $article->jsonSerializeDeleted();
     $this->em->remove($article);
     $this->em->flush();
     return $articleData;

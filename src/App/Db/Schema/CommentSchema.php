@@ -60,6 +60,7 @@ class CommentSchema implements JsonSerializable
 
   // Many comment belongs to an article
   #[ManyToOne(targetEntity: ArticleSchema::class, inversedBy: 'comments')]
+  #[JoinColumn(name: 'article_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
   private ArticleSchema|null $article = null;
 
   #[Column(name: "created_at", type: 'datetimetz_immutable', nullable: false)]
