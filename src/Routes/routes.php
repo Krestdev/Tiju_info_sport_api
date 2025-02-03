@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
+use App\Controllers\AdsController;
 use App\Controllers\ArticleController;
 use App\Controllers\CategoryController;
 use App\Controllers\CommentController;
 use App\Controllers\UserController;
 use App\Controllers\UserIndex;
+use App\Middleware\Ads\GetAdsAuthor;
+use App\Middleware\Ads\GetAds;
 use App\Middleware\Articles\GetArticle;
 use App\Middleware\Articles\GetArticleAuthor;
 use App\Middleware\Category\GetCategory;
@@ -75,7 +78,14 @@ $app->group('/api', function (RouteCollectorProxy $group) {
 
   $group->get('/category', [CategoryController::class, 'showAll']);
   $group->post('/category', [CategoryController::class, 'create'])->add(CategoryGetCategoryAuthor::class);
-  $group->get('/category/{category_id:[0-9]+}', [CategoryController::class, 'show'])->add(GetCategory::class); // needs get category MW
-  $group->patch('/category/{category_id:[0-9]+}', [CategoryController::class, 'update'])->add(GetCategory::class); // needs get category MW
-  $group->delete('/category/{category_id:[0-9]+}', [CategoryController::class, 'delete'])->add(GetCategory::class); // needs get category MW
+  $group->get('/category/{category_id:[0-9]+}', [CategoryController::class, 'show'])->add(GetCategory::class);
+  $group->patch('/category/{category_id:[0-9]+}', [CategoryController::class, 'update'])->add(GetCategory::class);
+  $group->delete('/category/{category_id:[0-9]+}', [CategoryController::class, 'delete'])->add(GetCategory::class);
+
+  // Advertisment
+  $group->get('/advertisement', [AdsController::class, 'showAll']);
+  $group->post('/advertisement', [AdsController::class, 'create'])->add(GetAdsAuthor::class);
+  $group->get('/advertisement/{advertisement_id:[0-9]+}', [AdsController::class, 'show'])->add(GetAds::class);
+  $group->patch('/advertisement/{advertisement_id:[0-9]+}', [AdsController::class, 'update'])->add(GetAds::class);
+  $group->delete('/advertisement/{advertisement_id:[0-9]+}', [AdsController::class, 'delete'])->add(GetAds::class);
 });

@@ -11,7 +11,9 @@ use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\JoinTable;
 use Doctrine\ORM\Mapping\ManyToMany;
+use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
+use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\PersistentCollection;
 use JsonSerializable;
@@ -85,6 +87,20 @@ class UserSchema implements JsonSerializable
 
   #[OneToMany(targetEntity: CategorySchema::class, mappedBy: 'author')]
   private Collection $categories;
+
+  // Advertisements
+
+  #[OneToMany(targetEntity: AdsSchema::class, mappedBy: 'author')]
+  private Collection $advertisements;
+
+  // Advertisements
+
+  #[OneToMany(targetEntity: PackageSchema::class, mappedBy: 'author')]
+  private Collection $packages;
+
+  /** one Customer has One Subscription. */
+  #[oneToOne(targetEntity: SubscriptionSchema::class, inversedBy: 'customer')]
+  private SubscriptionSchema|null $subscribed = null;
 
   #[Column(name: "created_at", type: 'datetimetz_immutable', nullable: false)]
   private DateTimeImmutable $createdAt;
@@ -217,6 +233,11 @@ class UserSchema implements JsonSerializable
     return $this->categories;
   }
 
+  public function getSubscription(): SubscriptionSchema
+  {
+    return $this->subscribed;
+  }
+
   public function getCreatedAt(): DateTimeImmutable
   {
     return $this->createdAt;
@@ -272,6 +293,11 @@ class UserSchema implements JsonSerializable
     $this->role = $role;
   }
 
+  public function setSubscription(SubscriptionSchema $subscription): void
+  {
+    $this->subscribed = $subscription;
+  }
+
   public function addComment(CommentSchema $comment): void
   {
     $this->comments->add($comment);
@@ -285,6 +311,16 @@ class UserSchema implements JsonSerializable
   public function addCategories(CategorySchema $article): void
   {
     $this->categories->add($article);
+  }
+
+  public function addAdvertisement(AdsSchema $article): void
+  {
+    $this->advertisements->add($article);
+  }
+
+  public function addPackage(PackageSchema $subscription): void
+  {
+    $this->packages->add($subscription);
   }
 
   public function setUpdatedAt(DateTimeImmutable $updatedAt): void
