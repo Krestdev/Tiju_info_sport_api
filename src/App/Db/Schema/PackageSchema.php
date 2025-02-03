@@ -69,6 +69,19 @@ class PackageSchema implements JsonSerializable
     ];
   }
 
+  public function jsonSerializeDeleted(): array
+  {
+    return [
+      'id' => $this->id,
+      'author' => $this->author,
+      'title' => $this->title,
+      'price' => $this->price,
+      'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
+      'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
+      'expires_on' => $this->expiresOn->format('Y-m-d H:i:s')
+    ];
+  }
+
   public function getId(): int
   {
     return $this->id;
