@@ -6,6 +6,8 @@ use App\Controllers\AdsController;
 use App\Controllers\ArticleController;
 use App\Controllers\CategoryController;
 use App\Controllers\CommentController;
+use App\Controllers\PackageController;
+use App\Controllers\SubscriptionController;
 use App\Controllers\UserController;
 use App\Controllers\UserIndex;
 use App\Middleware\Ads\GetAdsAuthor;
@@ -18,6 +20,10 @@ use App\Middleware\Comment\GetComment;
 use App\Middleware\Comment\GetCommentAuthor;
 use App\Middleware\Comment\GetParentComment;
 use App\Middleware\Comment\IdentifyUser;
+use App\Middleware\Package\GetPackage;
+use App\Middleware\Package\GetPackageAuthor;
+use App\Middleware\Subscription\GetSubscription;
+use App\Middleware\Subscription\GetSubscriptionAuthor;
 use Slim\Routing\RouteCollectorProxy;
 use App\Middleware\User\GetUser;
 
@@ -88,4 +94,18 @@ $app->group('/api', function (RouteCollectorProxy $group) {
   $group->get('/advertisement/{advertisement_id:[0-9]+}', [AdsController::class, 'show'])->add(GetAds::class);
   $group->patch('/advertisement/{advertisement_id:[0-9]+}', [AdsController::class, 'update'])->add(GetAds::class);
   $group->delete('/advertisement/{advertisement_id:[0-9]+}', [AdsController::class, 'delete'])->add(GetAds::class);
+
+  // Package
+  $group->get('/package', [PackageController::class, 'showAll']);
+  $group->post('/package', [PackageController::class, 'create'])->add(GetPackageAuthor::class);
+  $group->get('/package/{package_id:[0-9]+}', [PackageController::class, 'show'])->add(GetPackage::class);
+  $group->patch('/package/{package_id:[0-9]+}', [PackageController::class, 'update'])->add(GetPackage::class);
+  $group->delete('/package/{package_id:[0-9]+}', [PackageController::class, 'delete'])->add(GetPackage::class);
+
+  // subscription
+  $group->get('/subscription', [SubscriptionController::class, 'showAll']);
+  $group->post('/subscription', [SubscriptionController::class, 'create'])->add(GetSubscriptionAuthor::class);
+  $group->get('/subscription/{subscription_id:[0-9]+}', [SubscriptionController::class, 'show'])->add(GetSubscription::class);
+  $group->patch('/subscription/{subscription_id:[0-9]+}', [SubscriptionController::class, 'update'])->add(GetSubscription::class);
+  $group->delete('/subscription/{subscription_id:[0-9]+}', [SubscriptionController::class, 'delete'])->add(GetSubscription::class);
 });

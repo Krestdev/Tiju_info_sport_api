@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Db\Repository\SubscriptionService;
+use DateTimeImmutable;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Valitron\Validator;
@@ -46,6 +47,8 @@ class SubscriptionController
     $user = $request->getAttribute('author');
     $package = $request->getAttribute('package');
 
+    $data["expires_on"] = 'now';
+
     $subscription = $this->subscriptionService->create($user, $package, $data);
     $response->getBody()->write(json_encode($subscription));
     return $response;
@@ -60,6 +63,8 @@ class SubscriptionController
       $response->getBody()->write(json_encode($this->validator->errors()));
       return $response->withStatus(422);
     }
+
+    $data["expires_on"] = new DateTimeImmutable($data["expires_on"]);
 
     $subscription = $this->subscriptionService->update((int)$subscription_id, $data);
     $response->getBody()->write(json_encode($subscription));

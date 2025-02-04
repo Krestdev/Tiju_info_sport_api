@@ -99,7 +99,7 @@ class UserSchema implements JsonSerializable
   private Collection $packages;
 
   /** one Customer has One Subscription. */
-  #[oneToOne(targetEntity: SubscriptionSchema::class, inversedBy: 'customer')]
+  #[oneToOne(targetEntity: SubscriptionSchema::class, inversedBy: 'customer', cascade: ['persist', 'remove'], orphanRemoval: true)]
   private SubscriptionSchema|null $subscribed = null;
 
   #[Column(name: "created_at", type: 'datetimetz_immutable', nullable: false)]
@@ -293,7 +293,7 @@ class UserSchema implements JsonSerializable
     $this->role = $role;
   }
 
-  public function setSubscription(SubscriptionSchema $subscription): void
+  public function setSubscription(?SubscriptionSchema $subscription): void
   {
     $this->subscribed = $subscription;
   }

@@ -32,7 +32,7 @@ class PackageSchema implements JsonSerializable
   #[Column(type: 'integer', length: 255)]
   private int $price;
 
-  #[OneToMany(targetEntity: SubscriptionSchema::class, mappedBy: 'package')]
+  #[OneToMany(targetEntity: SubscriptionSchema::class, mappedBy: 'package', cascade: ['persist', 'remove'], orphanRemoval: true)]
   private Collection $subscriptions;
 
   #[Column(name: "expires_on", type: 'datetimetz_immutable', nullable: false)]
@@ -43,7 +43,7 @@ class PackageSchema implements JsonSerializable
   #[Column(name: 'updated_at', type: 'datetimetz_immutable', nullable: false)]
   private DateTimeImmutable $updatedAt;
 
-  private function __construct(UserSchema $user, array $data)
+  public function __construct(UserSchema $user, array $data)
   {
     $this->author = $user;
     $this->title = $data['title'];

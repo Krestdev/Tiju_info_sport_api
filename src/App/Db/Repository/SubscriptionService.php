@@ -49,6 +49,9 @@ final class SubscriptionService
   {
     $Subscription = $this->em->getRepository(SubscriptionSchema::class)->findOneBy(["id" => $id]);
     $SubscriptionData = $Subscription->jsonSerializeDeleted();
+    $Subscription->customer->setSubscription(null);
+    $Subscription->setPackage(null);
+    $Subscription->setCustomer(null);
     $this->em->remove($Subscription);
     $this->em->flush();
     return $SubscriptionData;

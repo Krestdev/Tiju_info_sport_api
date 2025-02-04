@@ -15,7 +15,7 @@ class PackageController
   {
     $this->validator->mapFieldsRules([
       'title' => ['required', ['lengthMin', 4]],
-      'price' => ['required', ['lengthMin', 4]],
+      'price' => ['required', 'integer'],
       'user_id' => ['required', ['lengthMin', 1]],
     ]);
   }

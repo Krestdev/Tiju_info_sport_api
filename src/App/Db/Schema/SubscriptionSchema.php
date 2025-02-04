@@ -27,8 +27,14 @@ class SubscriptionSchema implements JsonSerializable
 
   #[OneToOne(targetEntity: UserSchema::class, mappedBy: 'subscribed')]
   public UserSchema|null $customer = null;
-  public DateTimeImmutable $createdAt;
-  public DateTimeImmutable $updatedAt;
+
+  #[Column(name: "created_at", type: 'datetimetz_immutable', nullable: false)]
+  private DateTimeImmutable $createdAt;
+
+  #[Column(name: 'updated_at', type: 'datetimetz_immutable', nullable: false)]
+  private DateTimeImmutable $updatedAt;
+
+  #[Column(name: 'expires_on', type: 'datetimetz_immutable', nullable: false)]
   public DateTimeImmutable $expiresOn;
 
   public function __construct(UserSchema $user, PackageSchema $package, array $data)
@@ -91,7 +97,12 @@ class SubscriptionSchema implements JsonSerializable
     return $this->updatedAt;
   }
 
-  public function setPackage(PackageSchema $package): void
+  public function setCustomer(?UserSchema $customer): void
+  {
+    $this->customer = $customer;
+  }
+
+  public function setPackage(?PackageSchema $package): void
   {
     $this->package = $package;
   }
