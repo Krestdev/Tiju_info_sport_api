@@ -45,14 +45,14 @@ class UserSchema implements JsonSerializable
   #[Column(type: 'string', length: 50)]
   private string $country;
 
-  #[Column(type: 'string', length: 255)]
-  private string $photo;
-
   #[Column(type: 'string', length: 100, unique: true, nullable: false)]
   private string $password;
 
   #[Column(type: 'string', length: 100)]
   private string $role;
+
+  #[OneToOne(targetEntity: ImageSchema::class, inversedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
+  private ?ImageSchema $profile = null;
 
   /**
    * A user has many comments
@@ -117,7 +117,6 @@ class UserSchema implements JsonSerializable
     $this->sex = $data['sex'];
     $this->town = $data['town'];
     $this->country = $data['country'];
-    $this->photo = $data['photo'];
     $this->phone = $data['phone'];
     $this->role = $data['role'];
     $this->comments = new ArrayCollection();
@@ -143,7 +142,6 @@ class UserSchema implements JsonSerializable
       'sex' => $this->sex,
       'town' => $this->town,
       'country' => $this->country,
-      'photo' => $this->photo,
       'role' => $this->role,
       // 'comments' => $this->comments->toArray(),
       'liked' => $this->liked->count(),
@@ -161,6 +159,11 @@ class UserSchema implements JsonSerializable
   public function getUsername(): string
   {
     return $this->name;
+  }
+
+  public function getProfile(): ?ImageSchema
+  {
+    return $this->profile;
   }
 
   public function getNickname(): string
@@ -246,6 +249,11 @@ class UserSchema implements JsonSerializable
   public function getUpdatedAt(): DateTimeImmutable
   {
     return $this->updatedAt;
+  }
+
+  public function setProfile(?ImageSchema $profile): void
+  {
+    $this->profile = $profile;
   }
 
   public function setName(string $name): void

@@ -6,10 +6,12 @@ use App\Controllers\AdsController;
 use App\Controllers\ArticleController;
 use App\Controllers\CategoryController;
 use App\Controllers\CommentController;
+use App\Controllers\ImageController;
 use App\Controllers\PackageController;
 use App\Controllers\SubscriptionController;
 use App\Controllers\UserController;
 use App\Controllers\UserIndex;
+use App\Middleware\AddJasonResponseHeader;
 use App\Middleware\Ads\GetAdsAuthor;
 use App\Middleware\Ads\GetAds;
 use App\Middleware\Articles\GetArticle;
@@ -20,6 +22,8 @@ use App\Middleware\Comment\GetComment;
 use App\Middleware\Comment\GetCommentAuthor;
 use App\Middleware\Comment\GetParentComment;
 use App\Middleware\Comment\IdentifyUser;
+use App\Middleware\Image\GetImage;
+use App\Middleware\Image\GetImageOwner;
 use App\Middleware\Package\GetPackage;
 use App\Middleware\Package\GetPackageAuthor;
 use App\Middleware\Subscription\GetSubscription;
@@ -108,4 +112,12 @@ $app->group('/api', function (RouteCollectorProxy $group) {
   $group->get('/subscription/{subscription_id:[0-9]+}', [SubscriptionController::class, 'show'])->add(GetSubscription::class);
   $group->patch('/subscription/{subscription_id:[0-9]+}', [SubscriptionController::class, 'update'])->add(GetSubscription::class);
   $group->delete('/subscription/{subscription_id:[0-9]+}', [SubscriptionController::class, 'delete'])->add(GetSubscription::class);
+})->add(new AddJasonResponseHeader);
+
+// images
+$app->group('/api', function (RouteCollectorProxy $group) {
+  $group->post('/image', [ImageController::class, 'save'])->add(GetImageOwner::class);
+  $group->get('/image/{image_id:[0-9]+}', [ImageController::class, 'read'])->add(GetImage::class);
+  $group->post('/image/{image_id:[0-9]+}', [ImageController::class, 'updateImage'])->add(GetImage::class)->add(GetImageOwner::class);
+  $group->delete('/image/{image_id:[0-9]+}', [ImageController::class, 'deleteImage'])->add(GetImage::class);
 });

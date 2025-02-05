@@ -49,6 +49,9 @@ class ArticleSchema implements JsonSerializable
   #[ManyToOne(targetEntity: UserSchema::class, inversedBy: 'articles')]
   private UserSchema|null $author = null;
 
+  #[OneToMany(targetEntity: ImageSchema::class, mappedBy: 'article', cascade: ['persist', 'remove'], orphanRemoval: true)]
+  private Collection $images;
+
   #[ManyToOne(targetEntity: CategorySchema::class, inversedBy: 'articles')]
   #[JoinColumn(name: 'category_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
   private CategorySchema|null $category = null;
@@ -72,6 +75,7 @@ class ArticleSchema implements JsonSerializable
     $this->updatedAt = new DateTimeImmutable('now');
     $this->comments = new ArrayCollection();
     $this->likes = new ArrayCollection();
+    $this->images = new ArrayCollection();
 
     $user->addArticles($this);
     $category->addArticle($this);
@@ -85,6 +89,7 @@ class ArticleSchema implements JsonSerializable
       'title' => $this->title,
       'summery' => $this->summary,
       'description' => $this->description,
+      'images' => $this->images,
       'author' => $this->author,
       'comments' => $this->comments->toArray(),
       'likes' => $this->likes->count(),
@@ -136,6 +141,16 @@ class ArticleSchema implements JsonSerializable
   public function getAuthor(): UserSchema
   {
     return $this->author;
+  }
+
+  public function getCategory(): CategorySchema
+  {
+    return $this->category;
+  }
+
+  public function getImages(): Collection
+  {
+    return $this->images;
   }
 
   public function getCreatedAt(): DateTimeImmutable
@@ -192,6 +207,22 @@ class ArticleSchema implements JsonSerializable
     if ($this->likes->contains($user)) {
       $this->likes->removeElement($user);
       $user->getLikedBlogs()->removeElement($this);
+    }
+  }
+
+  // images
+
+  public function addImage(ImageSchema $image): void
+  {
+    if (!$this->images->contains($image)) {
+      $this->images->add($image);
+    }
+  }
+
+  public function removeImage(ImageSchema $image): void
+  {
+    if ($this->images->contains($image)) {
+      $this->images->removeElement($image);
     }
   }
 

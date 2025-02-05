@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\Table;
 use JsonSerializable;
 
@@ -31,8 +32,8 @@ class AdsSchema implements JsonSerializable
   #[Column(type: 'string', length: 255)]
   private string $url;
 
-  #[Column(type: 'string', length: 255)]
-  private string $image;
+  #[OneToOne(targetEntity: ImageSchema::class, inversedBy: 'advertisment', cascade: ['persist', 'remove'], orphanRemoval: true)]
+  private ?ImageSchema $image = null;
 
   #[Column(name: "created_at", type: 'datetimetz_immutable', nullable: false)]
   private DateTimeImmutable $createdAt;
@@ -44,7 +45,6 @@ class AdsSchema implements JsonSerializable
   {
     $this->author = $user;
     $this->title = $data['title'];
-    $this->image = $data['image'];
     $this->description = $data['description'];
     $this->url = $data['url'];
     $this->createdAt = new DateTimeImmutable();
@@ -96,7 +96,7 @@ class AdsSchema implements JsonSerializable
     return $this->title;
   }
 
-  public function getImage(): string
+  public function getImage(): ImageSchema
   {
     return $this->image;
   }
@@ -136,7 +136,7 @@ class AdsSchema implements JsonSerializable
     $this->url = $url;
   }
 
-  public function setImage(string $image): void
+  public function setImage(?ImageSchema $image): void
   {
     $this->image = $image;
   }

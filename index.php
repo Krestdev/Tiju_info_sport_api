@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Controllers\UserController;
 use Slim\Factory\AppFactory;
 use Slim\Handlers\Strategies\RequestResponseNamedArgs;
 use App\Middleware\AddJasonResponseHeader;
@@ -22,7 +23,6 @@ $app->addBodyParsingMiddleware();
 $error_middleware = $app->addErrorMiddleware(true, true, true);
 $error_handler = $error_middleware->getDefaultErrorHandler();
 $error_handler->forceContentType('application/json');
-$app->add(new AddJasonResponseHeader);
 
 require __DIR__ . '/src/Routes/routes.php';
 
