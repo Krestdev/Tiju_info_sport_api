@@ -6,6 +6,7 @@ use App\Controllers\UserController;
 use Slim\Factory\AppFactory;
 use Slim\Handlers\Strategies\RequestResponseNamedArgs;
 use App\Middleware\AddJasonResponseHeader;
+use App\Middleware\Authentication\RequireApiKey;
 
 require __DIR__ . '/vendor/autoload.php';
 

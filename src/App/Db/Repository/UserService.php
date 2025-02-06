@@ -26,7 +26,7 @@ final class UserService
 
   public function signIn(array $data): ?UserSchema
   {
-    return $this->em->getRepository(UserSchema::class)->findOneBy(['password' => $data['password'], 'email' => $data['email']]);
+    return $this->em->getRepository(UserSchema::class)->findOneBy(['email' => $data['email']]);
   }
 
   public function signOut(string $email): ?UserSchema
@@ -76,5 +76,10 @@ final class UserService
       $this->em->flush();
     }
     return $userData;
+  }
+
+  public function findeApiKey(string $apiKey): ?UserSchema
+  {
+    return $this->em->getRepository(UserSchema::class)->findOneBy(["api_key" => $apiKey]);
   }
 }

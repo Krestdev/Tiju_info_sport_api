@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Db\Repository\UserService;
+use Google\Service\Oauth2;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Exception\HttpNotFoundException;
 use Valitron\Validator;
+use Defuse\Crypto\Crypto;
+use Defuse\Crypto\Key;
+use Google\Client;
 
 class UserController
 {
@@ -24,6 +28,7 @@ class UserController
       'country' => ['required', ['lengthMin', 2]],
       'photo' => ['required', ['lengthMin', 2]],
       'password' => ['required', ['lengthMin', 8]],
+      "confirm_password" => ["optional", ["equals", "password"]],
       'role' => ['required', ['lengthMin', 2]],
     ]);
   }
@@ -31,17 +36,16 @@ class UserController
   public function show(Request $request, Response $response, string $user_id): Response
   {
     $user = $request->getAttribute('user');
-    $response->getBody()->write(json_encode($user));
+
+    $encription_key = Key::loadFromAsciiSafeString($_ENV['ENCRYPTION_KEY']);
+    $api_key = Crypto::encrypt($user->getApiKey(), $encription_key);
+    $response->getBody()->write(json_encode([
+      "user" => $user,
+      "api key" => $api_key
+    ]));
     return $response;
   }
 
-  /**
-   * This method creates a new user provided the email and password
-   * @param Request $request
-   * @param Response $response
-   * @param string $id
-   * @return Response
-   */
   public function signup(Request $request, Response $response): Response
   {
     $data = $request->getParsedBody();
@@ -57,6 +61,19 @@ class UserController
 
     if ($user !== null) {
       throw new HttpNotFoundException($request, "email address taken");
+    }
+
+    $data["password"] = password_hash($data["password"], PASSWORD_DEFAULT);
+
+    if ($data["role"] === "admin") {
+      $api_key = bin2hex(random_bytes(16));
+
+      $encryption_key = key::loadFromAsciiSafeString($_ENV["ENCRYPTION_KEY"]);
+
+      $data["api-key"] = Crypto::encrypt($api_key, $encryption_key);
+
+      // $data["api-key"] = $api_key;
+      $data['api-key-hash'] = hash_hmac('sha256', $api_key, $_ENV["HASH_SECRET_KEY"]);
     }
 
     $user = $this->userService->signUp($data);
@@ -77,16 +94,17 @@ class UserController
 
     $validatorLogin = $validatorLogin->withData($data);
     if (!$validatorLogin->validate()) {
-      echo json_encode($validatorLogin->errors());
       $response->getBody()->write(json_encode($validatorLogin->errors()));
       return $response->withStatus(422);
     }
 
-    $user = $this->userService->signIn(...array_values($data));
+    $user = $this->userService->signIn($data);
 
-    if ($user === null) {
+    if ($user === null || !password_verify($data["password"], $user->getPassword())) {
       throw new HttpNotFoundException($request, "Email or password not correct");
     }
+
+    $_SESSION['user_id'] = $user->getId();
 
     $response->getBody()->write(json_encode($user));
     return $response;
@@ -119,6 +137,62 @@ class UserController
   {
     $user = $this->userService->delete((int)$user_id);
     $response->getBody()->write(json_encode($user));
+    return $response;
+  }
+
+  public function logout(Request $request, Response $response): Response
+  {
+    session_destroy();
+    return $response->withStatus(302);
+  }
+
+  # google login
+  public function getGoogleUri(Request $request, Response $response): Response
+  {
+    $client = new Client;
+    $client->setClientId($_ENV["CLIENT_ID"]);
+    $client->setClientSecret($_ENV["CLIENT_SECRER"]);
+    $client->setRedirectUri($_ENV["REDIRECTURI"]);
+
+    $client->addScope("email");
+    $client->setScopes("profile");
+
+    $url = $client->createAuthUrl();
+
+    $response->getBody()->write(json_encode($url));
+
+    return $response;
+  }
+
+  // To be completed
+  public function storeGoogleUser(Request $request, Response $response)
+  {
+    $client = new Client;
+    $client->setClientId($_ENV["CLIENT_ID"]);
+    $client->setClientSecret($_ENV["CLIENT_SECRER"]);
+    $client->setRedirectUri($_ENV["REDIRECTURI"]);
+
+    $code = $request->getQueryParams()["code"];
+    if (!isset($code)) {
+      exit("Login Failed");
+    }
+
+    $token = $client->fetchAccessTokenWithAuthCode($code);
+
+    $client->setAccessToken($token["access_token"]);
+    $oauth = new Oauth2($client);
+
+    $userinfo = $oauth->userinfo->get();
+
+    $data = [
+      'email' => $userinfo->getEmail(),
+      'name' => $userinfo->getName(),
+      'sex' => $userinfo->getGender(),
+      'locale' => $userinfo->getLocale(),
+      'verif email' => $userinfo->getVerifiedEmail(),
+      'picture' => $userinfo->getPicture()
+    ];
+    $response->getBody()->write(json_encode($data));
     return $response;
   }
 }

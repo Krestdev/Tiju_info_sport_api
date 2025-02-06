@@ -16,6 +16,9 @@ use App\Middleware\Ads\GetAdsAuthor;
 use App\Middleware\Ads\GetAds;
 use App\Middleware\Articles\GetArticle;
 use App\Middleware\Articles\GetArticleAuthor;
+use App\Middleware\Authentication\RequireApiKey;
+use App\Middleware\Authentication\RequirLogin;
+use App\Middleware\Authentication\StartSession;
 use App\Middleware\Category\GetCategory;
 use App\Middleware\Category\GetCategoryAuthor as CategoryGetCategoryAuthor;
 use App\Middleware\Comment\GetComment;
@@ -33,17 +36,29 @@ use App\Middleware\User\GetUser;
 
 $app->group('/api', function (RouteCollectorProxy $group) {
 
+  // user google auth
+  $group->get('/users/google/uri', [UserController::class, 'getGoogleUri']);
+
+  $group->get('/users/google/store', [UserController::class, 'storeGoogleUser']);
+
   // user Routes
 
   $group->get('/users', UserIndex::class);
-  $group->post('/users', [UserController::class, 'signup']);
-  $group->post('/users/signin', [UserController::class, 'signIn']);
+  $group->post('/users', [UserController::class, 'signup'])->add(StartSession::class);
 
-  $group->group('/users', function (RouteCollectorProxy $group) {
-    $group->get('/{user_id:[0-9]+}', [UserController::class, 'show']);
-    $group->patch('/{user_id:[0-9]+}', [UserController::class, 'edit']);
-    $group->delete('/{user_id:[0-9]+}', [UserController::class, 'delete']);
-  })->add(GetUser::class);
+  $group->get('/profile/{user_id:[0-9]+}', [UserController::class, 'show'])->add(GetUser::class);
+
+  $group->group("", function (RouteCollectorProxy $group) {
+    $group->post('/users/signin', [UserController::class, 'signIn'])->add(StartSession::class);
+    $group->get('/users/signout', [UserController::class, 'logout'])->add(StartSession::class);
+
+    $group->group('/users', function (RouteCollectorProxy $group) {
+      $group->get('/{user_id:[0-9]+}', [UserController::class, 'show']);
+
+      $group->patch('/{user_id:[0-9]+}', [UserController::class, 'edit']);
+      $group->delete('/{user_id:[0-9]+}', [UserController::class, 'delete']);
+    })->add(GetUser::class);
+  })->add(RequireApiKey::class);
 
   // Comments Routes
 

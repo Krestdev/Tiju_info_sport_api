@@ -51,6 +51,12 @@ class UserSchema implements JsonSerializable
   #[Column(type: 'string', length: 100)]
   private string $role;
 
+  #[Column(name: "api_key", type: 'string', length: 255)]
+  private string $api_key;
+
+  #[Column(name: 'api_key_hash', type: 'string', length: 255)]
+  private string $api_key_hash;
+
   #[OneToOne(targetEntity: ImageSchema::class, inversedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
   private ?ImageSchema $profile = null;
 
@@ -85,7 +91,7 @@ class UserSchema implements JsonSerializable
 
   // categories
 
-  #[OneToMany(targetEntity: CategorySchema::class, mappedBy: 'author')]
+  #[OneToMany(targetEntity: CategorySchema::class, mappedBy: 'author', cascade: ['persist', 'remove'], orphanRemoval: false)]
   private Collection $categories;
 
   // Advertisements
@@ -93,9 +99,9 @@ class UserSchema implements JsonSerializable
   #[OneToMany(targetEntity: AdsSchema::class, mappedBy: 'author')]
   private Collection $advertisements;
 
-  // Advertisements
+  // packages
 
-  #[OneToMany(targetEntity: PackageSchema::class, mappedBy: 'author')]
+  #[OneToMany(targetEntity: PackageSchema::class, mappedBy: 'author', cascade: ['persist', 'remove'], orphanRemoval: false)]
   private Collection $packages;
 
   /** one Customer has One Subscription. */
@@ -103,10 +109,10 @@ class UserSchema implements JsonSerializable
   private SubscriptionSchema|null $subscribed = null;
 
   #[Column(name: "created_at", type: 'datetimetz_immutable', nullable: false)]
-  private DateTimeImmutable $createdAt;
+  private DateTimeImmutable $createdAt; // a rectifier
 
   #[Column(name: 'updated_at', type: 'datetimetz_immutable', nullable: false)]
-  private DateTimeImmutable $updatedAt;
+  private DateTimeImmutable $updatedAt; // retifier
 
   public function __construct(array $data)
   {
@@ -119,6 +125,8 @@ class UserSchema implements JsonSerializable
     $this->country = $data['country'];
     $this->phone = $data['phone'];
     $this->role = $data['role'];
+    $this->api_key = $data['api-key'];
+    $this->api_key_hash = $data['api-key-hash'];
     $this->comments = new ArrayCollection();
     $this->liked = new ArrayCollection();
     $this->signaled = new ArrayCollection();
@@ -143,6 +151,7 @@ class UserSchema implements JsonSerializable
       'town' => $this->town,
       'country' => $this->country,
       'role' => $this->role,
+      // 'api-key' => $this->api_key,
       // 'comments' => $this->comments->toArray(),
       'liked' => $this->liked->count(),
       'signals' => $this->signaled->count(),
@@ -204,6 +213,16 @@ class UserSchema implements JsonSerializable
   public function getRole(): string
   {
     return $this->role;
+  }
+
+  public function getApiKey(): string
+  {
+    return $this->api_key;
+  }
+
+  public function getApiKeyHash(): string
+  {
+    return $this->api_key_hash;
   }
 
   public function getComments(): Collection
@@ -299,6 +318,16 @@ class UserSchema implements JsonSerializable
   public function setRole(string $role): void
   {
     $this->role = $role;
+  }
+
+  public function setApiKey(string $apiKey): void
+  {
+    $this->api_key = $apiKey;
+  }
+
+  public function setApiKeyHash(string $apiKeyHash): void
+  {
+    $this->api_key_hash = $apiKeyHash;
   }
 
   public function setSubscription(?SubscriptionSchema $subscription): void
