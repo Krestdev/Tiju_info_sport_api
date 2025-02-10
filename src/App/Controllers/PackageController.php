@@ -17,6 +17,7 @@ class PackageController
       'title' => ['required', ['lengthMin', 4]],
       'price' => ['required', 'integer'],
       'user_id' => ['required', ['lengthMin', 1]],
+      'period' => ['required', 'numeric', ['min', 1]],
     ]);
   }
 

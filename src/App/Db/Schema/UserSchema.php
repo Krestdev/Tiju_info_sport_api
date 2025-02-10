@@ -106,7 +106,7 @@ class UserSchema implements JsonSerializable
 
   /** one Customer has One Subscription. */
   #[oneToOne(targetEntity: SubscriptionSchema::class, inversedBy: 'customer', cascade: ['persist', 'remove'], orphanRemoval: true)]
-  private SubscriptionSchema|null $subscribed = null;
+  private SubscriptionSchema|null $subscribed = null; //One active subscription at a time
 
   #[OneToMany(targetEntity: PaymentSchema::class, mappedBy: "customer", cascade: ["persist"])]
   private Collection $payments;

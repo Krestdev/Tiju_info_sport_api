@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Db\Repository\SubscriptionService;
+use DateInterval;
 use DateTimeImmutable;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -46,8 +47,12 @@ class SubscriptionController
 
     $user = $request->getAttribute('author');
     $package = $request->getAttribute('package');
+    $days = $package->getPeriod();
 
-    $data["expires_on"] = 'now';
+    $baseDate = new DateTimeImmutable();
+    $newDate = $baseDate->add(new DateInterval('P' . $days . 'D'));
+
+    $data["expires_on"] = $newDate;
 
     $subscription = $this->subscriptionService->create($user, $package, $data);
     $response->getBody()->write(json_encode($subscription));

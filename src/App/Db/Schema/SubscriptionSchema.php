@@ -54,7 +54,7 @@ class SubscriptionSchema implements JsonSerializable
     $this->status = $data['status'] ?? 'UNPAYED';
     $this->createdAt = new DateTimeImmutable('now');
     $this->updatedAt = new DateTimeImmutable('now');
-    $this->expiresOn = new DateTimeImmutable($data['expires_on']);
+    $this->expiresOn = $data['expires_on'];
 
     $user->setSubscription($this);
   }
@@ -103,6 +103,11 @@ class SubscriptionSchema implements JsonSerializable
   public function getPayments(): Collection
   {
     return $this->payments;
+  }
+
+  public function getExpiresOn(): DateTimeImmutable
+  {
+    return $this->expiresOn;
   }
 
   public function getCreatedAt(): DateTimeImmutable

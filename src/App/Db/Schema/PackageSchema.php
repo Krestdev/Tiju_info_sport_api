@@ -35,8 +35,8 @@ class PackageSchema implements JsonSerializable
   #[OneToMany(targetEntity: SubscriptionSchema::class, mappedBy: 'package', cascade: ['persist', 'remove'], orphanRemoval: true)]
   private Collection $subscriptions;
 
-  #[Column(name: "expires_on", type: 'datetimetz_immutable', nullable: false)]
-  private DateTimeImmutable $expiresOn;
+  #[Column(name: "period", type: 'integer', nullable: false)]
+  private int $period;
   #[Column(name: "created_at", type: 'datetimetz_immutable', nullable: false)]
   private DateTimeImmutable $createdAt;
 
@@ -51,7 +51,7 @@ class PackageSchema implements JsonSerializable
     $this->subscriptions = new ArrayCollection();
     $this->createdAt = new DateTimeImmutable();
     $this->updatedAt = new DateTimeImmutable();
-    $this->expiresOn = new DateTimeImmutable();
+    $this->period = $data['period'];
 
     $user->addPackage($this);
   }
@@ -65,7 +65,7 @@ class PackageSchema implements JsonSerializable
       'price' => $this->price,
       'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
       'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
-      'expires_on' => $this->expiresOn->format('Y-m-d H:i:s')
+      'period' => $this->period
     ];
   }
 
@@ -78,7 +78,7 @@ class PackageSchema implements JsonSerializable
       'price' => $this->price,
       'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
       'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
-      'expires_on' => $this->expiresOn->format('Y-m-d H:i:s')
+      'period' => $this->period
     ];
   }
 
@@ -112,9 +112,9 @@ class PackageSchema implements JsonSerializable
     return $this->updatedAt;
   }
 
-  public function getExpiresOn(): DateTimeImmutable
+  public function getPeriod(): int
   {
-    return $this->expiresOn;
+    return $this->period;
   }
 
   public function setTitle(string $title): void
@@ -137,8 +137,8 @@ class PackageSchema implements JsonSerializable
     $this->updatedAt = $updatedAt;
   }
 
-  public function setExpiresOn(DateTimeImmutable $expiresOn): void
+  public function setPeriod(int $period): void
   {
-    $this->expiresOn = $expiresOn;
+    $this->period = $period;
   }
 }

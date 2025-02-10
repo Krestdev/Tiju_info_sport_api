@@ -37,20 +37,21 @@ final class PackageService
 
   public function update(int $id, array $data): PackageSchema
   {
-    $Package = $this->findById($id);
-    $Package->setTitle($data['title']);
-    $Package->setPrice($data['price']);
-    $this->em->persist($Package);
+    $package = $this->findById($id);
+    $package->setTitle($data['title']);
+    $package->setPrice($data['price']);
+    $package->setPeriod($data['period']);
+    $this->em->persist($package);
     $this->em->flush();
-    return $Package;
+    return $package;
   }
 
   public function delete(int $id): ?array
   {
-    $Package = $this->em->getRepository(PackageSchema::class)->findOneBy(["id" => $id]);
-    $PackageData = $Package->jsonSerializeDeleted();
-    $this->em->remove($Package);
+    $package = $this->em->getRepository(PackageSchema::class)->findOneBy(["id" => $id]);
+    $packageData = $package->jsonSerializeDeleted();
+    $this->em->remove($package);
     $this->em->flush();
-    return $PackageData;
+    return $packageData;
   }
 }

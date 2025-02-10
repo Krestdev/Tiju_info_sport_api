@@ -7,6 +7,8 @@ namespace App\Db\Repository;
 use App\Db\Schema\PaymentSchema;
 use App\Db\Schema\SubscriptionSchema;
 use App\Db\Schema\UserSchema;
+use DateInterval;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -142,6 +144,12 @@ class PaymentService
       } else {
         $payment->setStatus($decodedBody[0]["status"]);
         $payment->getSubscription()->setStatus($decodedBody[0]["status"]);
+        if ($decodedBody[0]["status"] === "COMPLETED") {
+          $subscription = $payment->getSubscription();
+          $baseDate = new DateTimeImmutable();
+          $newDate = $baseDate->add(new DateInterval('P' . $subscription->getPackage()->getPeriod() . 'D'));
+          $subscription->setExpiresOn($newDate);
+        }
         $this->em->persist($payment);
         $this->em->flush();
       }
