@@ -108,11 +108,14 @@ class UserSchema implements JsonSerializable
   #[oneToOne(targetEntity: SubscriptionSchema::class, inversedBy: 'customer', cascade: ['persist', 'remove'], orphanRemoval: true)]
   private SubscriptionSchema|null $subscribed = null;
 
+  #[OneToMany(targetEntity: PaymentSchema::class, mappedBy: "customer", cascade: ["persist"])]
+  private Collection $payments;
+
   #[Column(name: "created_at", type: 'datetimetz_immutable', nullable: false)]
-  private DateTimeImmutable $createdAt; // a rectifier
+  private DateTimeImmutable $created_at; //
 
   #[Column(name: 'updated_at', type: 'datetimetz_immutable', nullable: false)]
-  private DateTimeImmutable $updatedAt; // retifier
+  private DateTimeImmutable $updated_at;
 
   public function __construct(array $data)
   {
@@ -133,8 +136,9 @@ class UserSchema implements JsonSerializable
     $this->articles = new ArrayCollection();
     $this->likeBlogs = new ArrayCollection();
     $this->categories = new ArrayCollection();
-    $this->createdAt = new DateTimeImmutable('now');
-    $this->updatedAt = new DateTimeImmutable('now');
+    $this->payments = new ArrayCollection();
+    $this->created_at = new DateTimeImmutable('now');
+    $this->updated_at = new DateTimeImmutable('now');
   }
   public function jsonSerialize(): array
   {
@@ -155,8 +159,8 @@ class UserSchema implements JsonSerializable
       // 'comments' => $this->comments->toArray(),
       'liked' => $this->liked->count(),
       'signals' => $this->signaled->count(),
-      'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
-      'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s')
+      'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+      'updated_at' => $this->updated_at->format('Y-m-d H:i:s')
     ];
   }
 
@@ -262,12 +266,12 @@ class UserSchema implements JsonSerializable
 
   public function getCreatedAt(): DateTimeImmutable
   {
-    return $this->createdAt;
+    return $this->created_at;
   }
 
-  public function getUpdatedAt(): DateTimeImmutable
+  public function getUpdated_at(): DateTimeImmutable
   {
-    return $this->updatedAt;
+    return $this->updated_at;
   }
 
   public function setProfile(?ImageSchema $profile): void
@@ -360,13 +364,25 @@ class UserSchema implements JsonSerializable
     $this->packages->add($subscription);
   }
 
-  public function setUpdatedAt(DateTimeImmutable $updatedAt): void
+  public function addPayment(PaymentSchema $payment): void
   {
-    $this->updatedAt = $updatedAt;
+    $this->payments->add($payment);
+  }
+
+  public function removePayment(PaymentSchema $payment): void
+  {
+    if ($this->payments->contains($payment)) {
+      $this->payments->removeElement($payment);
+    }
+  }
+
+  public function setUpdated_at(DateTimeImmutable $updated_at): void
+  {
+    $this->updated_at = $updated_at;
   }
 
   public function getCreatedAtFormatted(): string
   {
-    return $this->createdAt->format('Y-m-d H:i:s');
+    return $this->created_at->format('Y-m-d H:i:s');
   }
 }

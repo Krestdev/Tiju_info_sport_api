@@ -20,6 +20,7 @@ final class SubscriptionService
 
   public function create(UserSchema $user, PackageSchema $package, array $data): SubscriptionSchema
   {
+    $data[] = ['status' => 'CREATED'];
     $Subscription = new SubscriptionSchema($user, $package, $data);
     $this->em->persist($Subscription);
     $this->em->flush();

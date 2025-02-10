@@ -8,6 +8,7 @@ use App\Controllers\CategoryController;
 use App\Controllers\CommentController;
 use App\Controllers\ImageController;
 use App\Controllers\PackageController;
+use App\Controllers\PaymentController;
 use App\Controllers\SubscriptionController;
 use App\Controllers\UserController;
 use App\Controllers\UserIndex;
@@ -29,6 +30,8 @@ use App\Middleware\Image\GetImage;
 use App\Middleware\Image\GetImageOwner;
 use App\Middleware\Package\GetPackage;
 use App\Middleware\Package\GetPackageAuthor;
+use App\Middleware\Payments\GetPayment;
+use App\Middleware\Payments\PaymentUserAndSub;
 use App\Middleware\Subscription\GetSubscription;
 use App\Middleware\Subscription\GetSubscriptionAuthor;
 use Slim\Routing\RouteCollectorProxy;
@@ -38,14 +41,13 @@ $app->group('/api', function (RouteCollectorProxy $group) {
 
   // user google auth
   $group->get('/users/google/uri', [UserController::class, 'getGoogleUri']);
-
   $group->get('/users/google/store', [UserController::class, 'storeGoogleUser']);
+  $group->get('/sendmail', [UserController::class, "sendMail"]);
 
   // user Routes
 
   $group->get('/users', UserIndex::class);
   $group->post('/users', [UserController::class, 'signup'])->add(StartSession::class);
-
   $group->get('/profile/{user_id:[0-9]+}', [UserController::class, 'show'])->add(GetUser::class);
 
   $group->group("", function (RouteCollectorProxy $group) {
@@ -127,6 +129,13 @@ $app->group('/api', function (RouteCollectorProxy $group) {
   $group->get('/subscription/{subscription_id:[0-9]+}', [SubscriptionController::class, 'show'])->add(GetSubscription::class);
   $group->patch('/subscription/{subscription_id:[0-9]+}', [SubscriptionController::class, 'update'])->add(GetSubscription::class);
   $group->delete('/subscription/{subscription_id:[0-9]+}', [SubscriptionController::class, 'delete'])->add(GetSubscription::class);
+
+
+  $group->post("/pay", [PaymentController::class, "makePayment"])->add(PaymentUserAndSub::class);
+  $group->get("/pay/{payment_id:[0-9]+}", [PaymentController::class, "getPaymentById"])->add(GetPayment::class);
+  $group->get("/pay/retry/{payment_id:[0-9]+}", [PaymentController::class, "retryPayment"])->add(GetPayment::class);
+  $group->get("/pay/check/{payment_id:[0-9]+}", [PaymentController::class, "checkpaymentStatus"])->add(GetPayment::class);
+  $group->delete("/pay/delete/{payment_id:[0-9]+}", [PaymentController::class, "deletePayment"])->add(GetPayment::class);
 })->add(new AddJasonResponseHeader);
 
 // images

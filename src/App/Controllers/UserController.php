@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Db\Repository\UserService;
+use App\Mail\SendMail;
 use Google\Service\Oauth2;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -12,12 +13,14 @@ use Slim\Exception\HttpNotFoundException;
 use Valitron\Validator;
 use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
+use Exception;
 use Google\Client;
 
 class UserController
 {
-  public function __construct(private UserService $userService, private Validator $validator)
+  public function __construct(private UserService $userService, private SendMail $mailSender, private Validator $validator)
   {
+    $this->mailSender = new $mailSender();
     $this->validator->mapFieldsRules([
       'name' => ['required', ['lengthMin', 2]],
       'nick_name' => ['required', ['lengthMin', 2]],
@@ -192,7 +195,23 @@ class UserController
       'verif email' => $userinfo->getVerifiedEmail(),
       'picture' => $userinfo->getPicture()
     ];
+
     $response->getBody()->write(json_encode($data));
+    return $response;
+  }
+
+  // Sending mail should be handled as a background process 
+  // spatie/async v 1.7.0 require php ^8.3
+  // exploring new solutions
+  // functionality not working for now
+  public function sendMail(Request $request, Response $response): Response
+  {
+    try {
+      $this->mailSender->send("kenfackjordanjunior@gmail.com", "Jordan tiju", "mail test", "Hello");
+    } catch (Exception $e) {
+      $response->getBody()->write("Error sending mail");
+    }
+
     return $response;
   }
 }
