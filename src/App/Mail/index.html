@@ -1,44 +1,4 @@
-<?php
-
-declare(strict_types=1);
-
-namespace App\Mail;
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-
-class SendMail
-{
-  private PHPMailer $mailSender;
-  public function __construct()
-  {
-    $this->mailSender = new PHPMailer();
-    $this->mailSender->SMTPDebug = SMTP::DEBUG_SERVER;
-    $this->mailSender->isSMTP();
-    $this->mailSender->SMTPAuth = true;
-    $this->mailSender->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-    $this->mailSender->Host = $_ENV["SMTP_SERVER"];
-    $this->mailSender->Port = $_ENV["SMTP_PORT"];
-
-    $this->mailSender->Username = $_ENV["SMTP_EMAIL"];
-    $this->mailSender->Password = $_ENV["SMTP_PASSWORD"];
-    $this->mailSender->setFrom($_ENV["SMTP_EMAIL"], "Tiju Info Sport");
-  }
-
-  public function send(string $to, string $name, string $subject, string $body, bool $isHTML = false)
-  {
-    $this->mailSender->addAddress($to, $name);
-    $this->mailSender->isHTML($isHTML);
-    $this->mailSender->Subject = $subject;
-    $this->mailSender->Body = $body;
-    $this->mailSender->send();
-    return;
-  }
-
-  public function getHtmlBody(string $userName, string $link)
-  {
-    return `
-    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html dir="ltr" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="fr">
  <head>
   <meta charset="UTF-8">
@@ -149,7 +109,7 @@ a[x-apple-data-detectors],
                   <td align="center" valign="top" style="padding:0;Margin:0;width:520px">
                    <table cellpadding="0" cellspacing="0" width="100%" bgcolor="#fafafa" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:separate;border-spacing:0px;background-color:#fafafa;border-radius:10px" role="presentation">
                      <tr>
-                      <td align="left" style="padding:20px;Margin:0"><h3 style="Margin:0;font-family:Imprima, Arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:28px;font-style:normal;font-weight:bold;line-height:33.6px;color:#2D3142">Bienvenue, ` . $userName . `</h3><p style="Margin:0;mso-line-height-rule:exactly;font-family:Imprima, Arial, sans-serif;line-height:27px;letter-spacing:0;color:#2D3142;font-size:18px"><br></p><p style="Margin:0;mso-line-height-rule:exactly;font-family:Imprima, Arial, sans-serif;line-height:27px;letter-spacing:0;color:#2D3142;font-size:18px">Vous recevez ce message car vous vous êtes récemment inscrit pour un compte.</p><p style="Margin:0;mso-line-height-rule:exactly;font-family:Imprima, Arial, sans-serif;line-height:27px;letter-spacing:0;color:#2D3142;font-size:18px">Confirmez votre adresse e-mail en cliquant sur le bouton ci-dessous. Cette étape ajoute une sécurité supplémentaire à votre entreprise en vérifiant que vous êtes bien le propriétaire de cet e-mail..</p></td>
+                      <td align="left" style="padding:20px;Margin:0"><h3 style="Margin:0;font-family:Imprima, Arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:28px;font-style:normal;font-weight:bold;line-height:33.6px;color:#2D3142">Bienvenue, Gregory</h3><p style="Margin:0;mso-line-height-rule:exactly;font-family:Imprima, Arial, sans-serif;line-height:27px;letter-spacing:0;color:#2D3142;font-size:18px"><br></p><p style="Margin:0;mso-line-height-rule:exactly;font-family:Imprima, Arial, sans-serif;line-height:27px;letter-spacing:0;color:#2D3142;font-size:18px">Vous recevez ce message car vous vous êtes récemment inscrit pour un compte.</p><p style="Margin:0;mso-line-height-rule:exactly;font-family:Imprima, Arial, sans-serif;line-height:27px;letter-spacing:0;color:#2D3142;font-size:18px">Confirmez votre adresse e-mail en cliquant sur le bouton ci-dessous. Cette étape ajoute une sécurité supplémentaire à votre entreprise en vérifiant que vous êtes bien le propriétaire de cet e-mail..</p></td>
                      </tr>
                    </table></td>
                  </tr>
@@ -174,7 +134,7 @@ a[x-apple-data-detectors],
 		<w:anchorlock></w:anchorlock>
 		<center style='color:#ffffff; font-family:Imprima, Arial, sans-serif; font-size:22px; font-weight:700; line-height:22px;  mso-text-raise:1px'>Confirmer email</center>
 	</v:roundrect></a>
-<![endif]--><!--[if !mso]><!-- --><span class="es-button-border msohide" style="border-style:solid;border-color:#2CB543;background:#7630f3;border-width:0px;display:block;border-radius:30px;width:auto;mso-hide:all;mso-border-alt:10px"><a href="` . $link . `" target="_blank" class="es-button msohide" style="mso-style-priority:100 !important;text-decoration:none !important;mso-line-height-rule:exactly;color:#FFFFFF;font-size:22px;padding:15px 20px 15px 20px;display:block;background:#7630f3;border-radius:30px;font-family:Imprima, Arial, sans-serif;font-weight:bold;font-style:normal;line-height:26.4px;width:auto;text-align:center;letter-spacing:0;mso-padding-alt:0;mso-border-alt:10px solid #4114F7;mso-hide:all;padding-left:5px;padding-right:5px;border-color:#7630f3">Confirmer email</a></span><!--<![endif]--></td>
+<![endif]--><!--[if !mso]><!-- --><span class="es-button-border msohide" style="border-style:solid;border-color:#2CB543;background:#7630f3;border-width:0px;display:block;border-radius:30px;width:auto;mso-hide:all;mso-border-alt:10px"><a href="" target="_blank" class="es-button msohide" style="mso-style-priority:100 !important;text-decoration:none !important;mso-line-height-rule:exactly;color:#FFFFFF;font-size:22px;padding:15px 20px 15px 20px;display:block;background:#7630f3;border-radius:30px;font-family:Imprima, Arial, sans-serif;font-weight:bold;font-style:normal;line-height:26.4px;width:auto;text-align:center;letter-spacing:0;mso-padding-alt:0;mso-border-alt:10px solid #4114F7;mso-hide:all;padding-left:5px;padding-right:5px;border-color:#7630f3">Confirmer email</a></span><!--<![endif]--></td>
                      </tr>
                    </table></td>
                  </tr>
@@ -295,6 +255,3 @@ a[x-apple-data-detectors],
   </div>
  </body>
 </html>
-    `;
-  }
-}

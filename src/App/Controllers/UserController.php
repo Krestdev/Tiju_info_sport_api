@@ -80,6 +80,7 @@ class UserController
     }
 
     $user = $this->userService->signUp($data);
+    // send verification mail
     $response->getBody()->write(json_encode($user));
     return $response;
   }
