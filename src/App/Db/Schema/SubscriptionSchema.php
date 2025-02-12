@@ -28,7 +28,7 @@ class SubscriptionSchema implements JsonSerializable
   #[ManyToOne(targetEntity: PackageSchema::class, inversedBy: 'subscriptions')]
   public PackageSchema|null $package = null;
 
-  #[OneToOne(targetEntity: UserSchema::class, mappedBy: 'subscribed')]
+  #[ManyToOne(targetEntity: UserSchema::class, inversedBy: 'subscribed')]
   public UserSchema|null $customer = null;
 
   #[OneToMany(targetEntity: PaymentSchema::class, mappedBy: "subscription", cascade: ["persist"])]
@@ -51,12 +51,12 @@ class SubscriptionSchema implements JsonSerializable
     $this->customer = $user;
     $this->package = $package;
     $this->payments = new ArrayCollection();
-    $this->status = $data['status'] ?? 'UNPAYED';
+    $this->status = $data['status'] ?? 'UNPAID';
     $this->createdAt = new DateTimeImmutable('now');
     $this->updatedAt = new DateTimeImmutable('now');
     $this->expiresOn = $data['expires_on'];
 
-    $user->setSubscription($this);
+    $user->addSubscription($this);
   }
 
   public function jsonSerialize(): array

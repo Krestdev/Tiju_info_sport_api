@@ -52,6 +52,11 @@ final class UserService
     return $this->em->getRepository(UserSchema::class)->findOneBy(['id' => $id]);
   }
 
+  public function findByGoogleId(string $id): ?UserSchema
+  {
+    return $this->em->getRepository(UserSchema::class)->findOneBy(['google_id' => $id]);
+  }
+
   public function findbyEmail(string $email): ?UserSchema
   {
     return $this->em->getRepository(UserSchema::class)->findOneBy(['email' => $email]);

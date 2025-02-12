@@ -188,15 +188,28 @@ class UserController
     $userinfo = $oauth->userinfo->get();
 
     $data = [
-      'email' => $userinfo->getEmail(),
       'name' => $userinfo->getName(),
-      'sex' => $userinfo->getGender(),
-      'locale' => $userinfo->getLocale(),
+      'nick_name' => $userinfo->getGivenName() ?? $userinfo->getName(),
+      'email' => $userinfo->getEmail() ?? "noemail@gmail.com",
+      'password' => 'none',
+      'sex' => $userinfo->getGender() ?? "M/F",
+      'town' => "Town",
+      'country' => $userinfo->getLocale() ?? "Country",
+      'phone' => 'none',
       'verif email' => $userinfo->getVerifiedEmail(),
-      'picture' => $userinfo->getPicture()
+      'role' => 'user',
+      'google_id' => $userinfo->getId()
     ];
 
-    $response->getBody()->write(json_encode($data));
+    $user = $this->userService->findByGoogleId($userinfo->getId());
+    if ($user) {
+      $response->getBody()->write(json_encode($user));
+      return $response;
+    }
+
+    $user = $this->userService->signUp($data);
+
+    $response->getBody()->write(json_encode($user));
     return $response;
   }
 

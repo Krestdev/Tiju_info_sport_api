@@ -9,13 +9,11 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
-use Doctrine\ORM\Mapping\JoinTable;
 use Doctrine\ORM\Mapping\ManyToMany;
-use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\Table;
-use Doctrine\ORM\PersistentCollection;
+use Google\Service\RapidMigrationAssessment\Collector;
 use JsonSerializable;
 
 #[Entity, Table(name: 'users')]
@@ -51,11 +49,11 @@ class UserSchema implements JsonSerializable
   #[Column(type: 'string', length: 100)]
   private string $role;
 
-  #[Column(name: "api_key", type: 'string', length: 255)]
-  private string $api_key;
+  #[Column(name: "api_key", type: 'string', length: 255, nullable: true)]
+  private string|null $api_key;
 
-  #[Column(name: 'api_key_hash', type: 'string', length: 255)]
-  private string $api_key_hash;
+  #[Column(name: 'api_key_hash', type: 'string', length: 255, nullable: true)]
+  private string|null $api_key_hash;
 
   #[OneToOne(targetEntity: ImageSchema::class, inversedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
   private ?ImageSchema $profile = null;
@@ -105,8 +103,8 @@ class UserSchema implements JsonSerializable
   private Collection $packages;
 
   /** one Customer has One Subscription. */
-  #[oneToOne(targetEntity: SubscriptionSchema::class, inversedBy: 'customer', cascade: ['persist', 'remove'], orphanRemoval: true)]
-  private SubscriptionSchema|null $subscribed = null; //One active subscription at a time
+  #[oneToMany(targetEntity: SubscriptionSchema::class, mappedBy: 'customer', cascade: ['persist', 'remove'], orphanRemoval: true)]
+  private Collection $subscribed; //One active subscription at a time
 
   #[OneToMany(targetEntity: PaymentSchema::class, mappedBy: "customer", cascade: ["persist"])]
   private Collection $payments;
@@ -116,6 +114,9 @@ class UserSchema implements JsonSerializable
 
   #[Column(name: 'updated_at', type: 'datetimetz_immutable', nullable: false)]
   private DateTimeImmutable $updated_at;
+
+  #[Column(name: 'google_id', type: 'string', length: 255, nullable: true)]
+  private string|null $google_id = null;
 
   public function __construct(array $data)
   {
@@ -128,8 +129,9 @@ class UserSchema implements JsonSerializable
     $this->country = $data['country'];
     $this->phone = $data['phone'];
     $this->role = $data['role'];
-    $this->api_key = $data['api-key'];
-    $this->api_key_hash = $data['api-key-hash'];
+    $this->api_key = $data['api-key'] ?? null;
+    $this->api_key_hash = $data['api-key-hash'] ?? null;
+    $this->google_id = $data['google_id'] ?? null;
     $this->comments = new ArrayCollection();
     $this->liked = new ArrayCollection();
     $this->signaled = new ArrayCollection();
@@ -259,7 +261,7 @@ class UserSchema implements JsonSerializable
     return $this->categories;
   }
 
-  public function getSubscription(): SubscriptionSchema
+  public function getSubscription(): Collection
   {
     return $this->subscribed;
   }
@@ -272,6 +274,11 @@ class UserSchema implements JsonSerializable
   public function getUpdated_at(): DateTimeImmutable
   {
     return $this->updated_at;
+  }
+
+  public function getGoogleId(): string
+  {
+    return $this->google_id;
   }
 
   public function setProfile(?ImageSchema $profile): void
@@ -334,9 +341,40 @@ class UserSchema implements JsonSerializable
     $this->api_key_hash = $apiKeyHash;
   }
 
-  public function setSubscription(?SubscriptionSchema $subscription): void
+  public function addSubscription(?SubscriptionSchema $subscription): void
   {
-    $this->subscribed = $subscription;
+    $allFailedOrExpired = $this->subscribed->forAll(function ($index, $subscription) {
+      $status = $subscription->getStatus();
+      $expirationDate = $subscription->expiresOn();
+      $currentDate = new DateTimeImmutable();
+
+      return ($status === 'COMPLETED' && $expirationDate < $currentDate) || $status === 'FAILED';
+    });
+
+    if ($allFailedOrExpired && !$this->subscribed->contains($subscription)) {
+      $this->subscribed->add($subscription);
+    }
+  }
+
+  public function removeSubscription(SubscriptionSchema $subscription): void
+  {
+    if ($this->subscribed->contains($subscription)) {
+      $this->subscribed->removeElement($subscription);
+    }
+  }
+
+  public function hasNoActiveSubscription(): bool
+  {
+    if ($this->subscribed->count() > 0) {
+      return $this->subscribed->forAll(function ($index, $subscription) {
+        $status = $subscription->getStatus();
+        $expirationDate = $subscription->getExpiresOn();
+        $currentDate = new DateTimeImmutable();
+
+        return ($status === 'COMPLETED' && $expirationDate < $currentDate) || $status === 'FAILED';
+      });
+    }
+    return true;
   }
 
   public function addComment(CommentSchema $comment): void

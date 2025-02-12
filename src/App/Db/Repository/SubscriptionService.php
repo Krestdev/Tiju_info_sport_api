@@ -48,13 +48,13 @@ final class SubscriptionService
 
   public function delete(int $id): ?array
   {
-    $Subscription = $this->em->getRepository(SubscriptionSchema::class)->findOneBy(["id" => $id]);
-    $SubscriptionData = $Subscription->jsonSerializeDeleted();
-    $Subscription->customer->setSubscription(null);
-    $Subscription->setPackage(null);
-    $Subscription->setCustomer(null);
-    $this->em->remove($Subscription);
+    $subscription = $this->em->getRepository(SubscriptionSchema::class)->findOneBy(["id" => $id]);
+    $subscriptionData = $subscription->jsonSerializeDeleted();
+    $subscription->customer->removeSubscription($subscription);
+    $subscription->setPackage(null);
+    $subscription->setCustomer(null);
+    $this->em->remove($subscription);
     $this->em->flush();
-    return $SubscriptionData;
+    return $subscriptionData;
   }
 }

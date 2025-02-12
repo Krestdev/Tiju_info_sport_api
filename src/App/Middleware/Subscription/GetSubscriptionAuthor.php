@@ -11,6 +11,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Exception\HttpNotFoundException;
+use Slim\Exception\HttpUnauthorizedException;
 use Slim\Routing\RouteContext;
 
 class GetSubscriptionAuthor
@@ -29,6 +30,10 @@ class GetSubscriptionAuthor
 
     if ($author === null) {
       throw new HttpNotFoundException($request, "Author user not found");
+    }
+
+    if (!$author->hasNoActiveSubscription()) {
+      throw new HttpUnauthorizedException($request, "User has an active or unpayed subscription");
     }
 
     $package_id = $request->getParsedBody()['package_id'] ?? null;
