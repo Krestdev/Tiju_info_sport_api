@@ -28,3 +28,5 @@ $error_handler->forceContentType('application/json');
 require __DIR__ . '/src/Routes/routes.php';
 
 $app->run();
+
+// hosting.
