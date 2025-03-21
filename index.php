@@ -25,6 +25,7 @@ $error_middleware = $app->addErrorMiddleware(true, true, true);
 $error_handler = $error_middleware->getDefaultErrorHandler();
 $error_handler->forceContentType('application/json');
 
+require __DIR__ . '/src/App/Middleware/cors/CorsMiddleware.php';
 require __DIR__ . '/src/Routes/routes.php';
 
 $app->run();
