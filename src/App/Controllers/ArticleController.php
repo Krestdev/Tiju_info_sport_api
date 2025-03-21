@@ -23,7 +23,7 @@ class ArticleController
     ]);
   }
 
-  public function showAll(Request $request, Response $response, array $args): Response
+  public function showAll(Request $request, Response $response): Response
   {
     $articles = $this->articleService->readAll();
     $response->getBody()->write(json_encode($articles));

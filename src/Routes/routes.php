@@ -87,6 +87,7 @@ $app->group('/api', function (RouteCollectorProxy $group) {
   // Article Routes
 
   $group->post('/articles', [ArticleController::class, 'create'])->add(GetArticleAuthor::class);
+  $group->get('/articles', [ArticleController::class, 'showAll']);
 
   $group->group('/articles', function (RouteCollectorProxy $group) {
     $group->get('/{article_id:[0-9]+}', [ArticleController::class, 'show']);
