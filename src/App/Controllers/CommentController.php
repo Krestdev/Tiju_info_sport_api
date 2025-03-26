@@ -20,7 +20,7 @@ class CommentController
   {
     $this->validator->mapFieldsRules([
       'user_id' => ['required', ['lengthMin', 1]],
-      'article_id' => ['required', ['lengthMin', 1]],
+      // 'article_id' => ['required', ['lengthMin', 1]],
       'message' => ['required', ['lengthMin', 1]]
     ]);
   }
@@ -58,7 +58,7 @@ class CommentController
     return $response;
   }
 
-  public function responseComment(Request $request, Response $response, string $article_id, string $id): Response
+  public function responseComment(Request $request, Response $response, string $article_id, string $parent_id): Response
   {
     $parentComment = $request->getAttribute('parentComment');
     $author = $request->getAttribute('author');

@@ -20,7 +20,7 @@ class GetParentComment
   {
     $context = RouteContext::fromRequest($request);
     $route = $context->getRoute();
-    $id = $route->getArgument('id');
+    $id = $route->getArgument('parent_id');
 
     $comment = $this->commentService->findById((int)$id);
 

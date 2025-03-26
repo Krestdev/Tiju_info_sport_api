@@ -66,7 +66,7 @@ $app->group('/api', function (RouteCollectorProxy $group) {
   $group->group('/comments', function (RouteCollectorProxy $group) {
 
     $group->post('/{article_id:[0-9]+}', [CommentController::class, 'create'])->add(GetCommentAuthor::class)->add(GetArticle::class);
-    $group->post('/{article_id:[0-9]+}/{user_id:[0-9]+}', [CommentController::class, 'responseComment'])->add(GetParentComment::class)->add(GetCommentAuthor::class)->add(GetArticle::class);
+    $group->post('/{article_id:[0-9]+}/{parent_id:[0-9]+}', [CommentController::class, 'responseComment'])->add(GetParentComment::class)->add(GetCommentAuthor::class)->add(GetArticle::class);
     $group->get('/{comment_id:[0-9]+}', [CommentController::class, 'show'])->add(GetComment::class);
 
     $group->group('', function (RouteCollectorProxy $group) {

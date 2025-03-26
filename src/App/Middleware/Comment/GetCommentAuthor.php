@@ -25,11 +25,11 @@ class GetCommentAuthor
       throw new HttpNotFoundException($request, 'Massage Author required');
     }
 
-    $article_id = $request->getParsedBody()['article_id'] ?? null;
+    // $article_id = $request->getParsedBody()['article_id'] ?? null;
 
-    if (!isset($article_id)) {
-      throw new HttpNotFoundException($request, 'Massage Article required');
-    }
+    // if (!isset($article_id)) {
+    //   throw new HttpNotFoundException($request, 'Massage Article required');
+    // }
 
     $author = $this->userService->findById((int)$id);
 
@@ -37,14 +37,14 @@ class GetCommentAuthor
       throw new HttpNotFoundException($request, "Author user not found");
     }
 
-    $article = $this->articleService->findById((int)$article_id);
+    // $article = $this->articleService->findById((int)$article_id);
 
-    if ($article === null) {
-      throw new HttpNotFoundException($request, "Comment Article not found");
-    }
+    // if ($article === null) {
+    //   throw new HttpNotFoundException($request, "Comment Article not found");
+    // }
 
     $request = $request->withAttribute('author', $author);
-    $request = $request->withAttribute('article', $article);
+    // $request = $request->withAttribute('article', $article);
 
     return $handler->handle($request);
   }
