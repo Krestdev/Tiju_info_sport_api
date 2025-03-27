@@ -152,6 +152,7 @@ class UserSchema implements JsonSerializable
       'name' => $this->name,
       'email' => $this->email,
       'phone' => $this->phone,
+      'image' => $this->profile,
       'password' => $this->password,
       'sex' => $this->sex,
       'town' => $this->town,

@@ -67,7 +67,7 @@ class ImageController
 
         $image = $this->imageService->createUserProfile($user, $data);
       } elseif ($article) {
-        $data["location"] = "/uploads/articles/" . $article->getId() . "_image_" . $article->getImage()->count() . "." . end($type);
+        $data["location"] = "/uploads/articles/" . $article->getId() . "_image_" . $article->getImages()->count() . "." . end($type);
 
         $file->moveTo(dirname(__DIR__, 3) . $data["location"]);
 
