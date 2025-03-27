@@ -71,9 +71,9 @@ class ImageSchema implements JsonSerializable
   {
     return [
       'id' => $this->id,
-      'author' => $this->user,
-      'ads' => $this->advertisment,
-      'article' => $this->article,
+      // 'author' => $this->user,
+      // 'ads' => $this->advertisment,
+      // 'article' => $this->article,
       'size' => $this->size,
       'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
       'updated_at' => $this->updatedAt->format('Y-m-d H:i:s')

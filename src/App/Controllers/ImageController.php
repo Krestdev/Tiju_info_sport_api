@@ -109,6 +109,7 @@ class ImageController
 
       if ($user) {
         $data['location'] = "/uploads/users/" . $user->getId() . "." . end($type);
+
         $file->moveTo(dirname(__DIR__, 3) . $data["location"]);
       } elseif ($article) {
         $data["location"] = "/uploads/articles/" . $article->getId() . "_image_" . $article->getImage()->count() . "." . end($type);
