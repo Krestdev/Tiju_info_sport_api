@@ -89,7 +89,7 @@ class ArticleSchema implements JsonSerializable
       'title' => $this->title,
       'summery' => $this->summary,
       'description' => $this->description,
-      'images' => $this->images,
+      'images' => $this->images->toArray(),
       'author' => $this->author,
       'comments' => $this->comments->toArray(),
       'likes' => $this->likes->count(),

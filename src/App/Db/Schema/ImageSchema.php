@@ -32,7 +32,8 @@ class ImageSchema implements JsonSerializable
   private int $size;
 
   #[ManyToOne(targetEntity: ArticleSchema::class, inversedBy: 'images')]
-  private ?ArticleSchema $article = null;
+  #[JoinColumn(name: 'article_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+  private ?ArticleSchema $article;
 
   #[OneToOne(targetEntity: AdsSchema::class, mappedBy: 'image')]
   private ?AdsSchema $advertisment;
@@ -84,9 +85,9 @@ class ImageSchema implements JsonSerializable
   {
     return [
       'id' => $this->id,
-      'author' => $this->user,
-      'ads' => $this->advertisment,
-      'article' => $this->article,
+      // 'author' => $this->user,
+      // 'ads' => $this->advertisment,
+      // 'article' => $this->article,
       'size' => $this->size,
       'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
       'updated_at' => $this->updatedAt->format('Y-m-d H:i:s')
