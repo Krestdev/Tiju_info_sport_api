@@ -32,11 +32,11 @@ class ImageController
       return $response->withStatus(422);
     }
 
-    if ($file->getSize() > 1000000) {
+    if ($file->getSize() > 2000000) {
       return $response->withStatus(422);
     }
 
-    $mediaTypes = ["image/png", "image/jpeg"];
+    $mediaTypes = ["image/png", "image/jpeg", "image/webp", "image/jpeg"];
     if (! in_array($file->getClientMediaType(), $mediaTypes)) {
       return $response->withStatus(422);
     }
