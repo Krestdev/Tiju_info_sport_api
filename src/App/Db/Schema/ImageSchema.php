@@ -25,8 +25,8 @@ class ImageSchema implements JsonSerializable
   #[Id, Column(type: 'integer'), GeneratedValue(strategy: 'AUTO')]
   private int $id;
 
-  #[Column(type: 'string', length: 255)]
-  private string $location;
+  #[Column(type: 'string', length: 255, nullable: true)]
+  private ?string $location;
 
   #[Column(type: 'integer', length: 255)]
   private int $size;
@@ -35,10 +35,10 @@ class ImageSchema implements JsonSerializable
   #[JoinColumn(name: 'article_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
   private ?ArticleSchema $article;
 
-  #[OneToOne(targetEntity: AdsSchema::class, mappedBy: 'image')]
+  #[OneToOne(targetEntity: AdsSchema::class, mappedBy: 'image', cascade: ['persist', 'remove'])]
   private ?AdsSchema $advertisment;
 
-  #[OneToOne(targetEntity: UserSchema::class, mappedBy: 'profile')]
+  #[OneToOne(targetEntity: UserSchema::class, mappedBy: 'profile', cascade: ['persist', 'remove'])]
   private ?UserSchema $user;
 
   #[Column(name: "created_at", type: 'datetimetz_immutable', nullable: false)]
@@ -50,7 +50,7 @@ class ImageSchema implements JsonSerializable
   public function __construct(?UserSchema $user, ?AdsSchema $ads, ?ArticleSchema $article, array $data)
   {
     $this->size = $data['size'];
-    $this->location = $data['location'];
+    $this->location = $data['location'] ?? null;
     $this->article = $article;
     $this->advertisment = $ads;
     $this->user = $user;
@@ -75,6 +75,7 @@ class ImageSchema implements JsonSerializable
       // 'author' => $this->user,
       // 'ads' => $this->advertisment,
       // 'article' => $this->article,
+      'location' => $this->location,
       'size' => $this->size,
       'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
       'updated_at' => $this->updatedAt->format('Y-m-d H:i:s')

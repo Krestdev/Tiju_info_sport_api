@@ -31,7 +31,7 @@ class SubscriptionSchema implements JsonSerializable
   #[ManyToOne(targetEntity: UserSchema::class, inversedBy: 'subscribed')]
   public UserSchema|null $customer = null;
 
-  #[OneToMany(targetEntity: PaymentSchema::class, mappedBy: "subscription", cascade: ["persist"])]
+  #[OneToMany(targetEntity: PaymentSchema::class, mappedBy: "subscription", cascade: ['persist', 'remove'])]
   private Collection $payments;
 
   #[Column(type: 'string', length: 20)]

@@ -67,11 +67,14 @@ class ImageController
 
         $image = $this->imageService->createUserProfile($user, $data);
       } elseif ($article) {
-        $data["location"] = "/uploads/articles/" . $article->getId() . "_image_" . $article->getImages()->count() . "." . end($type);
+        print("Hello");
+        $imageData = $this->imageService->createBaseImage($data);
+
+        $data["location"] = "/uploads/articles/" . $article->getId() . "_image_" . $imageData->getId() . "." . end($type);
 
         $file->moveTo(dirname(__DIR__, 3) . $data["location"]);
 
-        $image = $this->imageService->addArticleImage($article, $data);
+        $image = $this->imageService->addArticleImage($article, $imageData, $data);
       } elseif ($advertisment) {
         $data["location"] = "/uploads/ads/" . $advertisment->getId() . "." . end($type);
 
@@ -104,6 +107,13 @@ class ImageController
       "size" => $file->getSize()
     ];
 
+    $name = [
+      "0" => "hello",
+      "1" => "me"
+    ];
+
+    print($name[0]);
+
     try {
       $type = explode("/", $file->getClientMediaType());
 
@@ -112,7 +122,7 @@ class ImageController
 
         $file->moveTo(dirname(__DIR__, 3) . $data["location"]);
       } elseif ($article) {
-        $data["location"] = "/uploads/articles/" . $article->getId() . "_image_" . $article->getImage()->count() . "." . end($type);
+        $data["location"] = "/uploads/articles/" . $article->getId() . "_image_" . $image_id . "." . end($type);
         $file->moveTo(dirname(__DIR__, 3) . $data["location"]);
       } elseif ($advertisment) {
         $data["location"] = "/uploads/ads/" . $advertisment->getId() . "." . end($type);

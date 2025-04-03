@@ -55,6 +55,13 @@ class ArticleController
     return $response;
   }
 
+  public function publish(Request $request, Response $response, string $article_id): Response
+  {
+    $article = $this->articleService->publish((int)$article_id);
+    $response->getBody()->write(json_encode($article));
+    return $response;
+  }
+
   public function update(Request $request, Response $response, string $article_id): Response
   {
     $data = $request->getParsedBody();

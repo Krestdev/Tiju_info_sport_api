@@ -20,6 +20,23 @@ final class ImageService
     $this->em = $em;
   }
 
+  public function createBaseImage(array $image): ImageSchema
+  {
+    $image = new ImageSchema(null, null, null, $image);
+    $this->em->persist($image);
+    $this->em->flush();
+    return $image;
+  }
+
+  public function DeleteBaseImage(int $id)
+  {
+    $image = $this->em->getRepository(ImageSchema::class)->findOneBy(["id" => $id]);
+    $imageData = $image->jsonSerializeDeleted();
+    $this->em->remove($image);
+    $this->em->flush();
+    return $imageData;
+  }
+
   public function createUserProfile(UserSchema $user, array $image): ImageSchema
   {
     $image = new ImageSchema($user, null, null, $image);
@@ -36,9 +53,10 @@ final class ImageService
     return $image;
   }
 
-  public function addArticleImage(ArticleSchema $article, array $image): ImageSchema
+  public function addArticleImage(ArticleSchema $article, ImageSchema $image, array $data): ImageSchema
   {
-    $image = new ImageSchema(null, null, $article, $image);
+    $image->setLocation($data['location']);
+    $image->setArticle($article);
     $this->em->persist($image);
     $this->em->flush();
     return $image;

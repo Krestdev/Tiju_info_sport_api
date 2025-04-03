@@ -92,6 +92,7 @@ $app->group('/api', function (RouteCollectorProxy $group) {
   $group->group('/articles', function (RouteCollectorProxy $group) {
     $group->get('/{article_id:[0-9]+}', [ArticleController::class, 'show']);
     $group->patch('/{article_id:[0-9]+}', [ArticleController::class, 'update']);
+    $group->patch('/publish/{article_id:[0-9]+}', [ArticleController::class, 'publish']);
     $group->delete('/{article_id:[0-9]+}', [ArticleController::class, 'delete']);
 
     // Article likes

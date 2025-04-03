@@ -37,12 +37,17 @@ class ArticleSchema implements JsonSerializable
 
   #[Column(type: 'string', length: 255)]
   private string $description;
-  // private string $media: string[],
+
+  #[Column(type: 'string', length: 255)]
+  private string $status;
+
+  #[Column(name: 'publish_on', type: 'datetimetz_immutable', nullable: true)]
+  private string $publish_on;
 
   #[OneToMany(targetEntity: CommentSchema::class, mappedBy: 'article', cascade: ['persist', 'remove'], orphanRemoval: true)]
   private Collection $comments;
 
-  #[ManyToMany(targetEntity: UserSchema::class, inversedBy: 'likeBlogs')]
+  #[ManyToMany(targetEntity: UserSchema::class, inversedBy: 'likeBlogs', cascade: ['persist', 'remove'])]
   #[JoinTable(name: 'articleLike_blogs')]
   private Collection $likes;
 
@@ -70,6 +75,7 @@ class ArticleSchema implements JsonSerializable
     $this->type = $data['type'];
     $this->summary = $data['summary'];
     $this->description = $data['description'];
+    $this->status = $data["status"];
     $this->category = $category;
     $this->createdAt = new DateTimeImmutable('now');
     $this->updatedAt = new DateTimeImmutable('now');
@@ -85,6 +91,7 @@ class ArticleSchema implements JsonSerializable
   {
     return [
       'id' => $this->id,
+      'status' => $this->status,
       'type' => $this->type,
       'title' => $this->title,
       'summery' => $this->summary,
@@ -102,6 +109,7 @@ class ArticleSchema implements JsonSerializable
   {
     return [
       'id' => $this->id,
+      'status' => $this->status,
       'type' => $this->type,
       'title' => $this->title,
       'summery' => $this->summary,
@@ -116,6 +124,11 @@ class ArticleSchema implements JsonSerializable
   public function getId(): int
   {
     return $this->id;
+  }
+
+  public function getStatus(): string
+  {
+    return $this->status;
   }
 
   public function getTitle(): string
@@ -171,6 +184,11 @@ class ArticleSchema implements JsonSerializable
   public function getLikes(): Collection
   {
     return $this->likes;
+  }
+
+  public function setStatus(string $status): void
+  {
+    $this->status = $status;
   }
 
   public function setTitle(string $title): void

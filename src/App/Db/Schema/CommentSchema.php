@@ -37,7 +37,7 @@ class CommentSchema implements JsonSerializable
    * One Message has many response
    * @var Collection<int, CommentSchema>
    */
-  #[OneToMany(targetEntity: CommentSchema::class, mappedBy: 'parent')]
+  #[OneToMany(targetEntity: CommentSchema::class, mappedBy: 'parent', cascade: ['persist', 'remove'])]
   private Collection $response;
 
   // Many comments reponds to one comment
@@ -49,12 +49,12 @@ class CommentSchema implements JsonSerializable
    * Many Comments Has Many user likes
    * @var Collection<int, UserSchema>
    */
-  #[ManyToMany(targetEntity: UserSchema::class, inversedBy: 'liked')]
+  #[ManyToMany(targetEntity: UserSchema::class, inversedBy: 'liked', cascade: ['persist', 'remove'])]
   #[JoinTable(name: 'users_liks')]
   private Collection $likes;
 
   // Many Comments Has Many signals
-  #[ManyToMany(targetEntity: UserSchema::class, inversedBy: 'signaled')]
+  #[ManyToMany(targetEntity: UserSchema::class, inversedBy: 'signaled', cascade: ['persist', 'remove'])]
   #[JoinTable(name: 'users_signals')]
   private Collection $signals;
 

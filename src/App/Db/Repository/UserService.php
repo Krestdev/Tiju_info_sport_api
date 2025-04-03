@@ -76,7 +76,7 @@ final class UserService
     $user = $this->em->getRepository(UserSchema::class)->findOneBy(['id' => $id]);
     $userData = null;
     if ($user) {
-      $userData = $user->jsonSerialize();
+      $userData = $user->jsonSerializeDeleted();
       $this->em->remove($user);
       $this->em->flush();
     }

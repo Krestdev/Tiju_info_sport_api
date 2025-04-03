@@ -25,7 +25,17 @@ final class ArticleService
 
   public function create(UserSchema $user, CategorySchema $category, array $data): ArticleSchema
   {
+    $data["status"] = "draft";
     $article = new ArticleSchema($user, $category, $data);
+    $this->em->persist($article);
+    $this->em->flush();
+    return $article;
+  }
+
+  public function publish(int $id): ArticleSchema
+  {
+    $article = $this->findById($id);
+    $article->setStatus("published");
     $this->em->persist($article);
     $this->em->flush();
     return $article;

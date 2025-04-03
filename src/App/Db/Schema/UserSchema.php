@@ -62,29 +62,29 @@ class UserSchema implements JsonSerializable
    * A user has many comments
    * @var Collection<int, CommentSchema>
    */
-  #[OneToMany(targetEntity: CommentSchema::class, mappedBy: 'author')]
+  #[OneToMany(targetEntity: CommentSchema::class, mappedBy: 'author', cascade: ['persist', 'remove'])]
   private Collection $comments;
 
   /**
    * Many users like many Comments
    * @var Collection<int, CommentSchema>
    */
-  #[ManyToMany(targetEntity: CommentSchema::class, mappedBy: 'likes')]
+  #[ManyToMany(targetEntity: CommentSchema::class, mappedBy: 'likes', cascade: ['persist', 'remove'])]
   private Collection $liked;
 
   /**
    * Many user signal many messages
    * @var Collection<int, CommentSchema>
    */
-  #[ManyToMany(targetEntity: CommentSchema::class, mappedBy: 'signals')]
+  #[ManyToMany(targetEntity: CommentSchema::class, mappedBy: 'signals', cascade: ['persist', 'remove'])]
   private Collection $signaled;
 
   // articles
 
-  #[OneToMany(targetEntity: ArticleSchema::class, mappedBy: 'author')]
+  #[OneToMany(targetEntity: ArticleSchema::class, mappedBy: 'author', cascade: ['persist', 'remove'])]
   private Collection $articles;
 
-  #[ManyToMany(targetEntity: ArticleSchema::class, mappedBy: 'likes')]
+  #[ManyToMany(targetEntity: ArticleSchema::class, mappedBy: 'likes', cascade: ['persist', 'remove'])]
   private Collection $likeBlogs;
 
   // categories
@@ -94,7 +94,7 @@ class UserSchema implements JsonSerializable
 
   // Advertisements
 
-  #[OneToMany(targetEntity: AdsSchema::class, mappedBy: 'author')]
+  #[OneToMany(targetEntity: AdsSchema::class, mappedBy: 'author', cascade: ['persist', 'remove'])]
   private Collection $advertisements;
 
   // packages
@@ -106,7 +106,7 @@ class UserSchema implements JsonSerializable
   #[oneToMany(targetEntity: SubscriptionSchema::class, mappedBy: 'customer', cascade: ['persist', 'remove'], orphanRemoval: true)]
   private Collection $subscribed; //One active subscription at a time
 
-  #[OneToMany(targetEntity: PaymentSchema::class, mappedBy: "customer", cascade: ["persist"])]
+  #[OneToMany(targetEntity: PaymentSchema::class, mappedBy: "customer", cascade: ["persist", "remove"])]
   private Collection $payments;
 
   #[Column(name: "created_at", type: 'datetimetz_immutable', nullable: false)]
@@ -153,6 +153,28 @@ class UserSchema implements JsonSerializable
       'email' => $this->email,
       'phone' => $this->phone,
       'image' => $this->profile,
+      'password' => $this->password,
+      'sex' => $this->sex,
+      'town' => $this->town,
+      'country' => $this->country,
+      'role' => $this->role,
+      // 'api-key' => $this->api_key,
+      // 'comments' => $this->comments->toArray(),
+      'liked' => $this->liked->count(),
+      'signals' => $this->signaled->count(),
+      'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+      'updated_at' => $this->updated_at->format('Y-m-d H:i:s')
+    ];
+  }
+
+  public function jsonSerializeDeleted(): array
+  {
+    return [
+      'id' => $this->id,
+      'name' => $this->name,
+      'email' => $this->email,
+      'phone' => $this->phone,
+      'image' => $this->profile->jsonSerializeDeleted(),
       'password' => $this->password,
       'sex' => $this->sex,
       'town' => $this->town,
