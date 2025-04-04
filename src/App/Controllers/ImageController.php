@@ -32,7 +32,7 @@ class ImageController
       return $response->withStatus(422);
     }
 
-    if ($file->getSize() > 2000000) {
+    if ($file->getSize() > 5000000) {
       return $response->withStatus(422);
     }
 
@@ -106,13 +106,6 @@ class ImageController
     $data = [
       "size" => $file->getSize()
     ];
-
-    $name = [
-      "0" => "hello",
-      "1" => "me"
-    ];
-
-    print($name[0]);
 
     try {
       $type = explode("/", $file->getClientMediaType());
