@@ -13,7 +13,7 @@ class SendMail
   public function __construct()
   {
     $this->mailSender = new PHPMailer();
-    $this->mailSender->SMTPDebug = SMTP::DEBUG_SERVER;
+    $this->mailSender->SMTPDebug = SMTP::DEBUG_OFF;
     $this->mailSender->isSMTP();
     $this->mailSender->SMTPAuth = true;
     $this->mailSender->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;

@@ -55,6 +55,12 @@ class UserSchema implements JsonSerializable
   #[Column(name: 'api_key_hash', type: 'string', length: 255, nullable: true)]
   private string|null $api_key_hash;
 
+  #[Column(type: "string", length: 255, nullable: true)]
+  private ?string $resetToken = null;
+
+  #[Column(type: "datetimetz_immutable", nullable: true)]
+  private ?DateTimeImmutable $resetTokenExpiresAt = null;
+
   #[OneToOne(targetEntity: ImageSchema::class, inversedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
   private ?ImageSchema $profile = null;
 
@@ -62,48 +68,48 @@ class UserSchema implements JsonSerializable
    * A user has many comments
    * @var Collection<int, CommentSchema>
    */
-  #[OneToMany(targetEntity: CommentSchema::class, mappedBy: 'author', cascade: ['persist', 'remove'])]
+  #[OneToMany(targetEntity: CommentSchema::class, mappedBy: 'author', cascade: ['persist'], orphanRemoval: true)]
   private Collection $comments;
 
   /**
    * Many users like many Comments
    * @var Collection<int, CommentSchema>
    */
-  #[ManyToMany(targetEntity: CommentSchema::class, mappedBy: 'likes', cascade: ['persist', 'remove'])]
+  #[ManyToMany(targetEntity: CommentSchema::class, mappedBy: 'likes', cascade: ['persist'], orphanRemoval: false)]
   private Collection $liked;
 
   /**
    * Many user signal many messages
    * @var Collection<int, CommentSchema>
    */
-  #[ManyToMany(targetEntity: CommentSchema::class, mappedBy: 'signals', cascade: ['persist', 'remove'])]
+  #[ManyToMany(targetEntity: CommentSchema::class, mappedBy: 'signals', cascade: ['persist'], orphanRemoval: false)]
   private Collection $signaled;
 
   // articles
 
-  #[OneToMany(targetEntity: ArticleSchema::class, mappedBy: 'author', cascade: ['persist', 'remove'])]
+  #[OneToMany(targetEntity: ArticleSchema::class, mappedBy: 'author', cascade: ['persist'], orphanRemoval: false)]
   private Collection $articles;
 
-  #[ManyToMany(targetEntity: ArticleSchema::class, mappedBy: 'likes', cascade: ['persist', 'remove'])]
+  #[ManyToMany(targetEntity: ArticleSchema::class, mappedBy: 'likes', cascade: ['persist'], orphanRemoval: false)]
   private Collection $likeBlogs;
 
   // categories
 
-  #[OneToMany(targetEntity: CategorySchema::class, mappedBy: 'author', cascade: ['persist', 'remove'], orphanRemoval: false)]
+  #[OneToMany(targetEntity: CategorySchema::class, mappedBy: 'author', cascade: ['persist'], orphanRemoval: false)]
   private Collection $categories;
 
   // Advertisements
 
-  #[OneToMany(targetEntity: AdsSchema::class, mappedBy: 'author', cascade: ['persist', 'remove'])]
+  #[OneToMany(targetEntity: AdsSchema::class, mappedBy: 'author', cascade: ['persist'], orphanRemoval: false)]
   private Collection $advertisements;
 
   // packages
 
-  #[OneToMany(targetEntity: PackageSchema::class, mappedBy: 'author', cascade: ['persist', 'remove'], orphanRemoval: false)]
+  #[OneToMany(targetEntity: PackageSchema::class, mappedBy: 'author', cascade: ['persist'], orphanRemoval: false)]
   private Collection $packages;
 
   /** one Customer has One Subscription. */
-  #[oneToMany(targetEntity: SubscriptionSchema::class, mappedBy: 'customer', cascade: ['persist', 'remove'], orphanRemoval: true)]
+  #[oneToMany(targetEntity: SubscriptionSchema::class, mappedBy: 'customer', cascade: ['persist'], orphanRemoval: true)]
   private Collection $subscribed; //One active subscription at a time
 
   #[OneToMany(targetEntity: PaymentSchema::class, mappedBy: "customer", cascade: ["persist", "remove"])]
@@ -302,6 +308,29 @@ class UserSchema implements JsonSerializable
   public function getGoogleId(): string
   {
     return $this->google_id;
+  }
+
+  public function setResetToken(?string $token): void
+  {
+    $this->resetToken = $token;
+    $this->resetTokenExpiresAt = new DateTimeImmutable('+1 hour'); // Token valid for 1 hour
+  }
+
+  public function getResetToken(): ?string
+  {
+    return $this->resetToken;
+  }
+
+
+  public function isResetTokenValid(): bool
+  {
+    return $this->resetToken !== null && new DateTimeImmutable() < $this->resetTokenExpiresAt;
+  }
+
+  public function clearResetToken(): void
+  {
+    $this->resetToken = null;
+    $this->resetTokenExpiresAt = null;
   }
 
   public function setProfile(?ImageSchema $profile): void

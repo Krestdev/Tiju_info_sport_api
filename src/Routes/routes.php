@@ -43,6 +43,9 @@ $app->group('/api', function (RouteCollectorProxy $group) {
   $group->get('/users/google/uri', [UserController::class, 'getGoogleUri']);
   $group->get('/users/google/store', [UserController::class, 'storeGoogleUser']);
   $group->get('/sendmail', [UserController::class, "sendMail"]);
+  $group->post('/users/password-reset/request', [UserController::class, 'requestPasswordReset']);
+  $group->post('/users/password-reset/validate', [UserController::class, 'validateToken']);
+  $group->post('/users/password-reset/reset', [UserController::class, 'resetPassword']);
 
   // user Routes
 

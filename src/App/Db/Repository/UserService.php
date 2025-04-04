@@ -47,9 +47,45 @@ final class UserService
     return $user;
   }
 
+  public function generateResetToken(int $id): ?string
+  {
+    $user = $this->em->getRepository(UserSchema::class)->findOneBy(['id' => $id]);
+    $resetToken = bin2hex(random_bytes(32));
+    if ($user) {
+      $user->setResetToken($resetToken);
+      $this->em->persist($user);
+      $this->em->flush();
+      $this->em->refresh($user);
+    }
+    return $resetToken;
+  }
+
+  public function resetPassword(UserSchema $user, string $password): ?UserSchema
+  {
+    // Hash the new password
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+    $user->setPassword($hashedPassword);
+    $user->clearResetToken();
+    $this->em->persist($user);
+    $this->em->flush();
+    $this->em->refresh($user);
+    return $user;
+  }
+
+  public function validateResetToken(string $token): ?UserSchema
+  {
+    return $this->em->getRepository(UserSchema::class)->findOneBy(['reset_token' => $token]);
+  }
+
+
   public function findById(int $id): ?UserSchema
   {
     return $this->em->getRepository(UserSchema::class)->findOneBy(['id' => $id]);
+  }
+
+  public function findByToken(string $token): ?UserSchema
+  {
+    return $this->em->getRepository(UserSchema::class)->findOneBy(['resetToken' => $token]);
   }
 
   public function findByGoogleId(string $id): ?UserSchema

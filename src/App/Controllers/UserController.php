@@ -114,6 +114,88 @@ class UserController
     return $response;
   }
 
+  public function requestPasswordReset(Request $request, Response $response): Response
+  {
+    $data = $request->getParsedBody();
+
+    $validatorLogin = new Validator($data);
+
+    $validatorLogin->mapFieldsRules([
+      'email' => ['required', 'email'],
+    ]);
+
+    $validatorLogin = $validatorLogin->withData($data);
+    if (!$validatorLogin->validate()) {
+      $response->getBody()->write(json_encode($validatorLogin->errors()));
+      return $response->withStatus(422);
+    }
+
+    $user = $this->userService->findbyEmail($data['email']);
+
+    if ($user === null) {
+      throw new HttpNotFoundException($request, "Email not found");
+    }
+
+    // Generate unique reset token
+    $resetToken = $this->userService->generateResetToken($user->getId());
+
+    // send mail with reset link
+    $resetLink = join(["http://slim.localhost/api/users/password-reset/validate?token", $resetToken]);
+    $this->mailSender->send($user->getEmail(), $user->getUsername(), "Password Reset Request", join(["Click here to reset your password: ", $resetLink]));
+    // send verification mail
+    $response->getBody()->write(json_encode($user));
+    return $response;
+  }
+
+  public function validateToken(Request $request, Response $response): Response
+  {
+
+    $data = $request->getParsedBody();
+    $user = $this->userService->validateResetToken($data->token);
+    if ($user === null) {
+      throw new HttpNotFoundException($request, "Token not valid");
+    }
+    $response->getBody()->write(json_encode('Token is valid'));
+    return $response;
+  }
+
+  public function resetPassword(Request $request, Response $response, string $token): Response
+  {
+    $data = $request->getParsedBody();
+
+    $validatorNewPassword = new Validator($data);
+
+    $validatorNewPassword->mapFieldsRules([
+      'password' => ['required', ['lengthMin', 8]],
+      'newPassword' => ['required', ['lengthMin', 8]],
+      'token' => ['required']
+    ]);
+
+
+    $validatorNewPassword = $validatorNewPassword->withData($data);
+    if (!$validatorNewPassword->validate()) {
+      $response->getBody()->write(json_encode($validatorNewPassword->errors()));
+      return $response->withStatus(422);
+    }
+
+    if (!$token || !$data->newPassword) {
+      throw new HttpNotFoundException($request, "Token or new password not provided");
+    }
+
+    $user = $this->userService->findByToken($token);
+
+    if (!$user || !$user->isResetTokenValid()) {
+      $response->getBody()->write(json_encode('Invalid or expired token'));
+      return $response->withStatus(400);
+    }
+
+    // Hash the new password
+    $user = $this->userService->resetPassword($user, $data->newPassword);
+
+    $response->getBody()->write(json_encode($user));
+    return $response;
+  }
+
   /**
    * This method creates a new user provided the email and password
    * @param Request $request
