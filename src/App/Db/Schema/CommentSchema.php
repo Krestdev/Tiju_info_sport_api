@@ -91,9 +91,9 @@ class CommentSchema implements JsonSerializable
       'author' => $this->author,
       'article_id' => $this->article->getId(),
       'message' => $this->message,
-      'likes' => $this->likes->count(),
+      'likes' => $this->likes->map(fn(UserSchema $user) => $user->getId())->toArray(),
       'response' => $this->response->toArray(),
-      'signals' => $this->signals->count(),
+      'signals' => $this->signals->map(fn(UserSchema $user) => $user->getId())->toArray(),
       'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
       'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
     ];

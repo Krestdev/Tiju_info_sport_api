@@ -53,6 +53,24 @@ class CategoryController
     return $response;
   }
 
+  public function createChild(Request $request, Response $response, string $parent_id): Response
+  {
+    $data = $request->getParsedBody();
+
+    $this->validator = $this->validator->withData($data);
+    if (!$this->validator->validate()) {
+      $response->getBody()->write(json_encode($this->validator->errors()));
+      return $response->withStatus(422);
+    }
+
+    $user = $request->getAttribute('author');
+    $parentCategory = $request->getAttribute('parentCategory');
+
+    $category = $this->categoryService->createChild($user, $parentCategory, $data);
+    $response->getBody()->write(json_encode($category));
+    return $response;
+  }
+
   public function update(Request $request, Response $response, string $category_id): Response
   {
     $data = $request->getParsedBody();

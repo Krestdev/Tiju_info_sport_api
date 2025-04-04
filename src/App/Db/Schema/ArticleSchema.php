@@ -99,7 +99,7 @@ class ArticleSchema implements JsonSerializable
       'images' => $this->images->toArray(),
       'author' => $this->author,
       'comments' => $this->comments->toArray(),
-      'likes' => $this->likes->count(),
+      'likes' => $this->likes->map(fn(UserSchema $user) => $user->getId())->toArray(),
       'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
       'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
     ];

@@ -11,9 +11,12 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\Table;
+use Google\Service\Books\Category;
+use InvalidArgumentException;
 use JsonSerializable;
 
 #[Entity, Table(name: "category")]
@@ -24,6 +27,14 @@ class CategorySchema implements JsonSerializable
 
   #[ManyToOne(targetEntity: UserSchema::class, inversedBy: 'categories')]
   private UserSchema|null $author = null;
+
+  // Many comments reponds to one comment
+  #[ManyToOne(targetEntity: CategorySchema::class, inversedBy: 'children')]
+  #[JoinColumn(name: 'parent_id', referencedColumnName: 'id')]
+  private CategorySchema|null $parent = null;
+
+  #[OneToMany(targetEntity: CategorySchema::class, mappedBy: 'parent', cascade: ['persist', 'remove'])]
+  private Collection $children;
 
   #[Column(type: 'string', length: 255)]
   private string $title;
@@ -63,6 +74,7 @@ class CategorySchema implements JsonSerializable
       'title' => $this->title,
       'author' => $this->author,
       'description' => $this->description,
+      'parent' => $this?->parent?->getId(),
       'image' => $this->image,
       'articles' => $this->articles->toArray(),
       'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
@@ -93,6 +105,19 @@ class CategorySchema implements JsonSerializable
     return $this->title;
   }
 
+  public function getParent(): CategorySchema
+  {
+    if (! isset($this->parent)) {
+      throw new InvalidArgumentException("No parent found");
+    }
+    return $this->parent;
+  }
+
+  public function getChildren(): Collection
+  {
+    return $this->children;
+  }
+
   public function getAuthor(): UserSchema
   {
     return $this->author;
@@ -116,6 +141,12 @@ class CategorySchema implements JsonSerializable
   public function setTitle(string $title): void
   {
     $this->title = $title;
+  }
+
+  public function setParent(CategorySchema $parent): void
+  {
+    $this->parent = $parent;
+    $parent->getChildren()->add($this);
   }
 
   public function setDescription(string $description): void

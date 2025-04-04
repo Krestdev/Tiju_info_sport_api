@@ -20,10 +20,19 @@ final class CategoryService
 
   public function create(UserSchema $user, array $data): CategorySchema
   {
-    $article = new CategorySchema($user, $data);
-    $this->em->persist($article);
+    $category = new CategorySchema($user, $data);
+    $this->em->persist($category);
     $this->em->flush();
-    return $article;
+    return $category;
+  }
+
+  public function createChild(UserSchema $user, CategorySchema $ParentCategory, array $data): CategorySchema
+  {
+    $category = new CategorySchema($user, $data);
+    $category->setParent($ParentCategory);
+    $this->em->persist($category);
+    $this->em->flush();
+    return $category;
   }
 
   public function readAll(): array
@@ -49,10 +58,10 @@ final class CategoryService
 
   public function delete(int $id): ?array
   {
-    $article = $this->em->getRepository(CategorySchema::class)->findOneBy(["id" => $id]);
-    $articleData = $article->jsonSerializeDeleted();
-    $this->em->remove($article);
+    $category = $this->em->getRepository(CategorySchema::class)->findOneBy(["id" => $id]);
+    $categoryData = $category->jsonSerializeDeleted();
+    $this->em->remove($category);
     $this->em->flush();
-    return $articleData;
+    return $categoryData;
   }
 }

@@ -21,6 +21,7 @@ use App\Middleware\Authentication\RequireApiKey;
 use App\Middleware\Authentication\StartSession;
 use App\Middleware\Category\GetCategory;
 use App\Middleware\Category\GetCategoryAuthor as CategoryGetCategoryAuthor;
+use App\Middleware\Category\GetParentCategory;
 use App\Middleware\Comment\GetComment;
 use App\Middleware\Comment\GetCommentAuthor;
 use App\Middleware\Comment\GetParentComment;
@@ -92,6 +93,7 @@ $app->group('/api', function (RouteCollectorProxy $group) {
   $group->group('/articles', function (RouteCollectorProxy $group) {
     $group->get('/{article_id:[0-9]+}', [ArticleController::class, 'show']);
     $group->patch('/{article_id:[0-9]+}', [ArticleController::class, 'update']);
+    // publish article
     $group->patch('/publish/{article_id:[0-9]+}', [ArticleController::class, 'publish']);
     $group->delete('/{article_id:[0-9]+}', [ArticleController::class, 'delete']);
 
@@ -106,6 +108,8 @@ $app->group('/api', function (RouteCollectorProxy $group) {
 
   $group->get('/category', [CategoryController::class, 'showAll']);
   $group->post('/category', [CategoryController::class, 'create'])->add(CategoryGetCategoryAuthor::class);
+  // add child category
+  $group->post('/category/sub/{parent_id:[0-9]+}', [CategoryController::class, 'createChild'])->add(CategoryGetCategoryAuthor::class)->add(GetParentCategory::class);
   $group->get('/category/{category_id:[0-9]+}', [CategoryController::class, 'show'])->add(GetCategory::class);
   $group->patch('/category/{category_id:[0-9]+}', [CategoryController::class, 'update'])->add(GetCategory::class);
   $group->delete('/category/{category_id:[0-9]+}', [CategoryController::class, 'delete'])->add(GetCategory::class);
