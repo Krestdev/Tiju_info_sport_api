@@ -6,6 +6,8 @@ use App\Controllers\AdsController;
 use App\Controllers\ArticleController;
 use App\Controllers\CategoryController;
 use App\Controllers\CommentController;
+use App\Controllers\ContentController;
+use App\Controllers\FooterController;
 use App\Controllers\ImageController;
 use App\Controllers\PackageController;
 use App\Controllers\PaymentController;
@@ -26,6 +28,7 @@ use App\Middleware\Comment\GetComment;
 use App\Middleware\Comment\GetCommentAuthor;
 use App\Middleware\Comment\GetParentComment;
 use App\Middleware\Comment\IdentifyUser;
+use App\Middleware\Content\GetContentParent;
 use App\Middleware\Image\GetImage;
 use App\Middleware\Image\GetImageOwner;
 use App\Middleware\Package\GetPackage;
@@ -98,6 +101,7 @@ $app->group('/api', function (RouteCollectorProxy $group) {
     $group->patch('/{article_id:[0-9]+}', [ArticleController::class, 'update']);
     // publish article
     $group->patch('/publish/{article_id:[0-9]+}', [ArticleController::class, 'publish']);
+    $group->patch('/trash/{article_id:[0-9]+}', [ArticleController::class, 'trash']);
     $group->delete('/{article_id:[0-9]+}', [ArticleController::class, 'delete']);
 
     // Article likes
@@ -138,12 +142,23 @@ $app->group('/api', function (RouteCollectorProxy $group) {
   $group->patch('/subscription/{subscription_id:[0-9]+}', [SubscriptionController::class, 'update'])->add(GetSubscription::class);
   $group->delete('/subscription/{subscription_id:[0-9]+}', [SubscriptionController::class, 'delete'])->add(GetSubscription::class);
 
-
   $group->post("/pay", [PaymentController::class, "makePayment"])->add(PaymentUserAndSub::class);
   $group->get("/pay/{payment_id:[0-9]+}", [PaymentController::class, "getPaymentById"])->add(GetPayment::class);
   $group->get("/pay/retry/{payment_id:[0-9]+}", [PaymentController::class, "retryPayment"])->add(GetPayment::class);
   $group->get("/pay/check/{payment_id:[0-9]+}", [PaymentController::class, "checkpaymentStatus"])->add(GetPayment::class);
   $group->delete("/pay/delete/{payment_id:[0-9]+}", [PaymentController::class, "deletePayment"])->add(GetPayment::class);
+
+  $group->get('/footer/show', [FooterController::class, 'showAll']); // ok
+  $group->get('/footer/{footer_id:[0-9]+}', [FooterController::class, 'show']); // to be tested
+  $group->post('/footer/create', [FooterController::class, 'create']); // testing
+  $group->patch('/footer/update/{footer_id:[0-9]+}', [FooterController::class, 'update']);
+  $group->delete('/footer/delete/{footer_id:[0-9]+}', [FooterController::class, 'delete']);
+
+  $group->get('/content/show', [ContentController::class, 'showAll']);
+  $group->post('/content/create', [ContentController::class, 'create'])->add(GetContentParent::class);
+  $group->patch('/content/update/{content_id:[0-9]+}', [ContentController::class, 'update']);
+  $group->delete('/content/delete/{content_id:[0-9]+}', [ContentController::class, 'delete']);
+  $group->get('/content/{content_id:[0-9]+}', [ContentController::class, 'show']);
 })->add(new AddJasonResponseHeader);
 
 // images

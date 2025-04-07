@@ -8,10 +8,6 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use App\Db\Repository\CommentService;
 use App\Db\Repository\UserService;
-use App\Db\Schema\CommentSchema;
-use App\Db\Schema\UserSchema;
-use Doctrine\ORM\EntityManager;
-use Slim\Exception\HttpNotFoundException;
 use Valitron\Validator;
 
 class CommentController

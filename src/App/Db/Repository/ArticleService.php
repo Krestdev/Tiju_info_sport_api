@@ -7,6 +7,7 @@ namespace App\Db\Repository;
 use App\Db\Schema\ArticleSchema;
 use App\Db\Schema\CategorySchema;
 use App\Db\Schema\UserSchema;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManager;
 
 final class ArticleService
@@ -41,6 +42,16 @@ final class ArticleService
     return $article;
   }
 
+
+  public function sendTotrash(int $id): ArticleSchema
+  {
+    $article = $this->findById($id);
+    $article->setStatus("deleted");
+    $this->em->persist($article);
+    $this->em->flush();
+    return $article;
+  }
+
   public function findById(int $id): ?ArticleSchema
   {
     return $this->em->getRepository(ArticleSchema::class)->findOneBy(["id" => $id]);
@@ -52,10 +63,14 @@ final class ArticleService
     $article->setsummary($data['summary']);
     $article->setDescription($data['description']);
     $article->setTitle($data['title']);
+    if (isset($data['publish_on'])) {
+      $article->setPublishedOn(new DateTimeImmutable($data['publish_on']));
+    }
     $this->em->persist($article);
     $this->em->flush();
     return $article;
   }
+
   public function delete(int $id): ?array
   {
     $article = $this->em->getRepository(ArticleSchema::class)->findOneBy(["id" => $id]);

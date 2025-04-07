@@ -75,7 +75,7 @@ class AdsSchema implements JsonSerializable
       'title' => $this->title,
       'description' => $this->description,
       'url' => $this->url,
-      'image' => $this->image,
+      // 'image' => $this->image,
       'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
       'updated_at' => $this->updatedAt->format('Y-m-d H:i:s')
     ];

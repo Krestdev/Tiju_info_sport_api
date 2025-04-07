@@ -39,10 +39,10 @@ class ArticleSchema implements JsonSerializable
   private string $description;
 
   #[Column(type: 'string', length: 255)]
-  private string $status;
+  private string $status; // published, draft, deleted
 
   #[Column(name: 'publish_on', type: 'datetimetz_immutable', nullable: true)]
-  private string $publish_on;
+  private ?DateTimeImmutable $publish_on;
 
   #[OneToMany(targetEntity: CommentSchema::class, mappedBy: 'article', cascade: ['persist', 'remove'], orphanRemoval: true)]
   private Collection $comments;
@@ -75,6 +75,7 @@ class ArticleSchema implements JsonSerializable
     $this->type = $data['type'];
     $this->summary = $data['summary'];
     $this->description = $data['description'];
+    $this->publish_on = $data['publish_on'] ? new DateTimeImmutable($data['publish_on']) : null;
     $this->status = $data["status"];
     $this->category = $category;
     $this->createdAt = new DateTimeImmutable('now');
@@ -96,6 +97,7 @@ class ArticleSchema implements JsonSerializable
       'title' => $this->title,
       'summery' => $this->summary,
       'description' => $this->description,
+      'publish_on' => $this->publish_on->format('Y-m-d H:i:s'),
       'images' => $this->images->toArray(),
       'author' => $this->author,
       'comments' => $this->comments->toArray(),
@@ -114,6 +116,7 @@ class ArticleSchema implements JsonSerializable
       'title' => $this->title,
       'summery' => $this->summary,
       'description' => $this->description,
+      'publish_on' => $this->publish_on->format('Y-m-d H:i:s'),
       'author' => $this->author,
       'likes' => $this->likes->count(),
       'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
@@ -139,6 +142,11 @@ class ArticleSchema implements JsonSerializable
   public function getType(): string
   {
     return $this->type;
+  }
+
+  public function getPublishOn(): DateTimeImmutable
+  {
+    return $this->publish_on;
   }
 
   public function getsummary(): string
@@ -199,6 +207,11 @@ class ArticleSchema implements JsonSerializable
   public function setType(string $type): void
   {
     $this->type = $type;
+  }
+
+  public function setPublishedOn(DateTimeImmutable $publish_on): void
+  {
+    $this->publish_on = $publish_on;
   }
 
   public function setsummary(string $summary): void

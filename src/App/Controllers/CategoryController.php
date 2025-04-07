@@ -19,6 +19,7 @@ class CategoryController
       'image' => ['required', ['lengthMin', 2]],
       'description' => ['required', ['lengthMin', 2]],
       'user_id' => ['required', ['lengthMin', 1]],
+      'color' => [['lengthMin', 2]]
     ]);
   }
 

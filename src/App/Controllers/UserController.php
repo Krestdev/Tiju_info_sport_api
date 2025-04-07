@@ -140,7 +140,7 @@ class UserController
     $resetToken = $this->userService->generateResetToken($user->getId());
 
     // send mail with reset link
-    $resetLink = join(["http://slim.localhost/api/users/password-reset/validate?token", $resetToken]);
+    $resetLink = join(["http://tyjuinfosport.com/user/restaure-password?token=", $resetToken]);
     $this->mailSender->send($user->getEmail(), $user->getUsername(), "Password Reset Request", join(["Click here to reset your password: ", $resetLink]));
     // send verification mail
     $response->getBody()->write(json_encode($user));

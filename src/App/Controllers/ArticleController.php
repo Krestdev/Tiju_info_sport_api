@@ -20,6 +20,7 @@ class ArticleController
       'description' => ['required', ['lengthMin', 2]],
       'type' => ['required', ['lengthMin', 2]],
       'user_id' => ['required', ['lengthMin', 1]],
+      'publish_on' => ['date']
     ]);
   }
 
@@ -58,6 +59,14 @@ class ArticleController
   public function publish(Request $request, Response $response, string $article_id): Response
   {
     $article = $this->articleService->publish((int)$article_id);
+    $response->getBody()->write(json_encode($article));
+    return $response;
+  }
+
+
+  public function trash(Request $request, Response $response, string $article_id): Response
+  {
+    $article = $this->articleService->sendTotrash((int)$article_id);
     $response->getBody()->write(json_encode($article));
     return $response;
   }

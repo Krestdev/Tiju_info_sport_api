@@ -43,6 +43,9 @@ class CategorySchema implements JsonSerializable
   private string $description;
 
   #[Column(type: 'string', length: 255)]
+  private string $color;
+
+  #[Column(type: 'string', length: 255)]
   private string $image;
 
   #[OneToMany(targetEntity: ArticleSchema::class, mappedBy: 'category', cascade: ['persist', 'remove'], orphanRemoval: true)]
@@ -60,6 +63,7 @@ class CategorySchema implements JsonSerializable
     $this->author = $user;
     $this->description = $data['description'];
     $this->image = $data['image'];
+    $this->color = $data['color'] ?? 'none';
     $this->articles = new ArrayCollection();
     $this->createdAt = new DateTimeImmutable();
     $this->updatedAt = new DateTimeImmutable();
@@ -74,6 +78,7 @@ class CategorySchema implements JsonSerializable
       'title' => $this->title,
       'author' => $this->author,
       'description' => $this->description,
+      'color' => $this->color,
       'parent' => $this?->parent?->getId(),
       'image' => $this->image,
       'articles' => $this->articles->toArray(),
@@ -89,6 +94,7 @@ class CategorySchema implements JsonSerializable
       'title' => $this->title,
       'author' => $this->author,
       'description' => $this->description,
+      'color' => $this->color,
       'image' => $this->image,
       'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
       'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
@@ -133,6 +139,11 @@ class CategorySchema implements JsonSerializable
     return $this->image;
   }
 
+  public function getColor(): string
+  {
+    return $this->color;
+  }
+
   public function getArticles(): Collection
   {
     return $this->articles;
@@ -141,6 +152,11 @@ class CategorySchema implements JsonSerializable
   public function setTitle(string $title): void
   {
     $this->title = $title;
+  }
+
+  public function setColor(string $color): void
+  {
+    $this->color = $color;
   }
 
   public function setParent(CategorySchema $parent): void

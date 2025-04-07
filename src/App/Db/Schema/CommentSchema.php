@@ -15,7 +15,6 @@ use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\Table;
-use Doctrine\ORM\PersistentCollection;
 use InvalidArgumentException;
 use JsonSerializable;
 
