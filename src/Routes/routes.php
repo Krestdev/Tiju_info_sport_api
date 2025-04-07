@@ -59,6 +59,7 @@ $app->group('/api', function (RouteCollectorProxy $group) {
   $group->post('/users/signin', [UserController::class, 'signIn'])->add(StartSession::class);
   $group->get('/users/signout', [UserController::class, 'logout'])->add(StartSession::class);
   $group->patch('/users/{user_id:[0-9]+}', [UserController::class, 'edit'])->add(GetUser::class);
+  $group->patch('/users/changerole/{user_id:[0-9]+}', [UserController::class, 'changeRole'])->add(GetUser::class);
 
   $group->group("", function (RouteCollectorProxy $group) {
 

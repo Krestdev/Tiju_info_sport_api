@@ -32,7 +32,7 @@ class UserController
       'photo' => ['required', ['lengthMin', 2]],
       'password' => ['required', ['lengthMin', 8]],
       "confirm_password" => ["optional", ["equals", "password"]],
-      'role' => ['required', ['lengthMin', 2]],
+      'role' => ['required', ['in', ["admin", "user", "editor", "super-admin"]],],
     ]);
   }
 
@@ -68,16 +68,18 @@ class UserController
 
     $data["password"] = password_hash($data["password"], PASSWORD_DEFAULT);
 
-    if ($data["role"] === "admin") {
-      $api_key = bin2hex(random_bytes(16));
+    $data["role"] = "user";
 
-      $encryption_key = key::loadFromAsciiSafeString($_ENV["ENCRYPTION_KEY"]);
+    // if ($data["role"] === "super-admin") {
+    //   $api_key = bin2hex(random_bytes(16));
 
-      $data["api-key"] = Crypto::encrypt($api_key, $encryption_key);
+    //   $encryption_key = key::loadFromAsciiSafeString($_ENV["ENCRYPTION_KEY"]);
 
-      // $data["api-key"] = $api_key;
-      $data['api-key-hash'] = hash_hmac('sha256', $api_key, $_ENV["HASH_SECRET_KEY"]);
-    }
+    //   $data["api-key"] = Crypto::encrypt($api_key, $encryption_key);
+
+    //   // $data["api-key"] = $api_key;
+    //   $data['api-key-hash'] = hash_hmac('sha256', $api_key, $_ENV["HASH_SECRET_KEY"]);
+    // }
 
     $user = $this->userService->signUp($data);
     // send verification mail
@@ -110,6 +112,81 @@ class UserController
 
     $_SESSION['user_id'] = $user->getId();
 
+    $response->getBody()->write(json_encode($user));
+    return $response;
+  }
+
+  public function changeRole(Request $request, Response $response, string $user_id): Response
+  {
+    $data = $request->getParsedBody();
+
+    $rolechangeValidator = new Validator($data);
+    $rolechangeValidator->mapFieldsRules([
+      'from_role' => ['required', ['in', ["admin", "user", "editor", "super-admin"]],],
+      'to_role' => ['required', ['in', ["admin", "user", "editor", "super-admin"]],],
+      'target_user_id' => ['required', 'integer'],
+    ]);
+
+    // validate the data
+    $validated = $rolechangeValidator->withData($data);
+    if (!$validated->validate()) {
+      $response->getBody()->write(json_encode($validated->errors()));
+      return $response->withStatus(422);
+    }
+
+    // Same Role
+    if ($data['from_role'] === $data['to_role']) {
+      throw new HttpNotFoundException($request, "You cannot change to the same role");
+    }
+
+    // Cannot change an admin to super-admin or super-admin to admin
+    if ($data['from_role'] === "admin" && $data['to_role'] === "super-admin") {
+      throw new HttpNotFoundException($request, "You cannot change to super-admin");
+    }
+    if ($data['from_role'] === "super-admin" && $data['to_role'] === "admin") {
+      throw new HttpNotFoundException($request, "You cannot change to admin");
+    }
+
+    // Cannot change a super-admin to user or editor
+    if ($data['from_role'] === "super-admin" && $data['to_role'] === "user") {
+      throw new HttpNotFoundException($request, "You cannot change to user");
+    }
+    if ($data['from_role'] === "super-admin" && $data['to_role'] === "editor") {
+      throw new HttpNotFoundException($request, "You cannot change to editor");
+    }
+
+    // Cannot change an editor or user to super-admin
+    if ($data['from_role'] === "user" && $data['to_role'] === "super-admin") {
+      throw new HttpNotFoundException($request, "You cannot change to super-admin");
+    }
+    if ($data['from_role'] === "editor" && $data['to_role'] === "super-admin") {
+      throw new HttpNotFoundException($request, "You cannot change to super-admin");
+    }
+    // if ($data['from_role'] === "user" && $data['to_role'] === "admin") {
+    //   throw new HttpNotFoundException($request, "You cannot change to admin");
+    // }
+    // if ($data['from_role'] === "editor" && $data['to_role'] === "admin") {
+    //   throw new HttpNotFoundException($request, "You cannot change to admin");
+    // }
+
+    // Cannot change an editor to user or user to editor
+    // if ($data['from_role'] === "user" && $data['to_role'] === "editor") {
+    //   throw new HttpNotFoundException($request, "You cannot change to editor");
+    // }
+    // if ($data['from_role'] === "editor" && $data['to_role'] === "user") {
+    //   throw new HttpNotFoundException($request, "You cannot change to user");
+    // }
+
+    // Cannot change an admin to user or user to admin
+    // if ($data['from_role'] === "admin" && $data['to_role'] === "user") {
+    //   throw new HttpNotFoundException($request, "You cannot change to user");
+    // }
+    // if ($data['from_role'] === "admin" && $data['to_role'] === "editor") {
+    //   throw new HttpNotFoundException($request, "You cannot change to editor");
+    // }
+
+
+    $user = $this->userService->changeRole((int)$data['target_user_id'], $data['to_role']);
     $response->getBody()->write(json_encode($user));
     return $response;
   }
@@ -196,13 +273,6 @@ class UserController
     return $response;
   }
 
-  /**
-   * This method creates a new user provided the email and password
-   * @param Request $request
-   * @param Response $response
-   * @param string $id
-   * @return Response
-   */
   public function edit(Request $request, Response $response, string $user_id): Response
   {
     $data = $request->getParsedBody();
@@ -232,7 +302,6 @@ class UserController
     return $response->withStatus(302);
   }
 
-  # google login
   public function getGoogleUri(Request $request, Response $response): Response
   {
     $client = new Client;
@@ -296,10 +365,6 @@ class UserController
     return $response;
   }
 
-  // Sending mail should be handled as a background process 
-  // spatie/async v 1.7.0 require php ^8.3
-  // exploring new solutions
-  // functionality not working for now
   public function sendMail(Request $request, Response $response): Response
   {
     try {

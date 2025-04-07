@@ -47,7 +47,7 @@ class UserSchema implements JsonSerializable
   private string $password;
 
   #[Column(type: 'string', length: 100)]
-  private string $role;
+  private string $role; // admin, user, editor, super-admin
 
   #[Column(name: "api_key", type: 'string', length: 255, nullable: true)]
   private string|null $api_key;

@@ -47,6 +47,18 @@ final class UserService
     return $user;
   }
 
+  public function changeRole(int $id, string $role): ?UserSchema
+  {
+    $user = $this->em->getRepository(UserSchema::class)->findOneBy(['id' => $id]);
+    if ($user) {
+      $user->setRole($role);
+      $this->em->persist($user);
+      $this->em->flush();
+      $this->em->refresh($user);
+    }
+    return $user;
+  }
+
   public function generateResetToken(int $id): ?string
   {
     $user = $this->em->getRepository(UserSchema::class)->findOneBy(['id' => $id]);
