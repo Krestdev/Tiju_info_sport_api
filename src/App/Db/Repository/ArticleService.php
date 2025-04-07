@@ -66,6 +66,14 @@ final class ArticleService
     if (isset($data['publish_on'])) {
       $article->setPublishedOn(new DateTimeImmutable($data['publish_on']));
     }
+    if (isset($data['headline'])) {
+      if ($data['headline'] == 1) {
+        $data['headline'] = true;
+      } else {
+        $data['headline'] = false;
+      }
+      $article->setHeadline($data['headline']);
+    }
     $this->em->persist($article);
     $this->em->flush();
     return $article;

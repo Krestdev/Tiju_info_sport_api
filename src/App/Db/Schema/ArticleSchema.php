@@ -29,6 +29,9 @@ class ArticleSchema implements JsonSerializable
   #[Column(type: 'string', length: 255)]
   private string $type;
 
+  #[Column(type: 'boolean', length: 255)]
+  private bool $headline;
+
   #[Column(type: 'string', length: 255)]
   private string $title;
 
@@ -77,6 +80,7 @@ class ArticleSchema implements JsonSerializable
     $this->description = $data['description'];
     $this->publish_on = $data['publish_on'] ? new DateTimeImmutable($data['publish_on']) : null;
     $this->status = $data["status"];
+    $this->headline = $data['headline'] ?? false;
     $this->category = $category;
     $this->createdAt = new DateTimeImmutable('now');
     $this->updatedAt = new DateTimeImmutable('now');
@@ -93,6 +97,7 @@ class ArticleSchema implements JsonSerializable
     return [
       'id' => $this->id,
       'status' => $this->status,
+      'headline' => $this->headline,
       'type' => $this->type,
       'title' => $this->title,
       'summery' => $this->summary,
@@ -112,6 +117,7 @@ class ArticleSchema implements JsonSerializable
     return [
       'id' => $this->id,
       'status' => $this->status,
+      'headline' => $this->headline,
       'type' => $this->type,
       'title' => $this->title,
       'summery' => $this->summary,
@@ -132,6 +138,11 @@ class ArticleSchema implements JsonSerializable
   public function getStatus(): string
   {
     return $this->status;
+  }
+
+  public function isHeadline(): bool
+  {
+    return $this->headline;
   }
 
   public function getTitle(): string
@@ -197,6 +208,11 @@ class ArticleSchema implements JsonSerializable
   public function setStatus(string $status): void
   {
     $this->status = $status;
+  }
+
+  public function setHeadline(bool $headline): void
+  {
+    $this->headline = $headline;
   }
 
   public function setTitle(string $title): void
