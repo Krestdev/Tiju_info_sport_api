@@ -169,3 +169,9 @@ $app->group('/api', function (RouteCollectorProxy $group) {
   $group->post('/image/{image_id:[0-9]+}', [ImageController::class, 'updateImage'])->add(GetImage::class)->add(GetImageOwner::class);
   $group->delete('/image/{image_id:[0-9]+}', [ImageController::class, 'deleteImage'])->add(GetImage::class);
 });
+
+
+$app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function ($req, $res) {
+  $handler = $this->notFoundHandler; // handle using the default Slim page not found handler
+  return $handler($req, $res);
+});
