@@ -7,9 +7,6 @@ use Slim\Factory\AppFactory;
 use Slim\Handlers\Strategies\RequestResponseNamedArgs;
 use App\Middleware\AddJasonResponseHeader;
 use App\Middleware\Authentication\RequireApiKey;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
-use Psr\Http\Message\ResponseInterface as Response;
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -28,15 +25,11 @@ $error_middleware = $app->addErrorMiddleware(true, true, true);
 $error_handler = $error_middleware->getDefaultErrorHandler();
 $error_handler->forceContentType('application/json');
 
-// CORS Middleware
-$app->add(function (Request $request, RequestHandler $handler) {
-  $response = $handler->handle($request);
-  return $response
-    ->withHeader('Access-Control-Allow-Origin', '*')
-    ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization, x-api-key')
-    ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+$app->options('/{routes:.+}', function ($request, $response) {
+  return $response->withStatus(204); // 204 No Content for preflight
 });
-// require __DIR__ . '/src/App/Middleware/cors/CorsMiddleware.php';
+
+require __DIR__ . '/src/App/Middleware/cors/CorsMiddleware.php';
 require __DIR__ . '/src/Routes/routes.php';
 
 $app->run();
