@@ -25,9 +25,9 @@ $error_middleware = $app->addErrorMiddleware(true, true, true);
 $error_handler = $error_middleware->getDefaultErrorHandler();
 $error_handler->forceContentType('application/json');
 
-$app->options('/{routes:.+}', function ($request, $response) {
-  return $response->withStatus(204); // 204 No Content for preflight
-});
+// $app->options('/{routes:.+}', function ($request, $response) {
+//   return $response->withStatus(204); // 204 No Content for preflight
+// });
 
 require __DIR__ . '/src/App/Middleware/cors/CorsMiddleware.php';
 require __DIR__ . '/src/Routes/routes.php';
