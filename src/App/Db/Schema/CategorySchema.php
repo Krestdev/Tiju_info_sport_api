@@ -40,6 +40,9 @@ class CategorySchema implements JsonSerializable
   private string $title;
 
   #[Column(type: 'string', length: 255)]
+  private string $slug;
+
+  #[Column(type: 'string', length: 255)]
   private string $description;
 
   #[Column(type: 'string', length: 255)]
@@ -60,6 +63,7 @@ class CategorySchema implements JsonSerializable
   public function __construct(UserSchema $user, array $data)
   {
     $this->title = $data['title'];
+    $this->slug = $data['slug'];
     $this->author = $user;
     $this->description = $data['description'];
     $this->image = $data['image'];
@@ -76,6 +80,7 @@ class CategorySchema implements JsonSerializable
     return [
       'id' => $this->id,
       'title' => $this->title,
+      'slug' => $this->slug,
       'author' => $this->author,
       'description' => $this->description,
       'color' => $this->color,
@@ -92,6 +97,7 @@ class CategorySchema implements JsonSerializable
     return [
       'id' => $this->id,
       'title' => $this->title,
+      'slug' => $this->slug,
       'author' => $this->author,
       'description' => $this->description,
       'color' => $this->color,
@@ -107,6 +113,11 @@ class CategorySchema implements JsonSerializable
   }
 
   public function getTitle(): string
+  {
+    return $this->title;
+  }
+
+  public function getSlug(): string
   {
     return $this->title;
   }
@@ -150,6 +161,11 @@ class CategorySchema implements JsonSerializable
   }
 
   public function setTitle(string $title): void
+  {
+    $this->title = $title;
+  }
+
+  public function setSlug(string $title): void
   {
     $this->title = $title;
   }

@@ -140,51 +140,33 @@ class UserController
     }
 
     // Cannot change an admin to super-admin or super-admin to admin
-    if ($data['from_role'] === "admin" && $data['to_role'] === "super-admin") {
-      throw new HttpNotFoundException($request, "You cannot change to super-admin");
-    }
     if ($data['from_role'] === "super-admin" && $data['to_role'] === "admin") {
       throw new HttpNotFoundException($request, "You cannot change to admin");
-    }
-
-    // Cannot change a super-admin to user or editor
-    if ($data['from_role'] === "super-admin" && $data['to_role'] === "user") {
-      throw new HttpNotFoundException($request, "You cannot change to user");
     }
     if ($data['from_role'] === "super-admin" && $data['to_role'] === "editor") {
       throw new HttpNotFoundException($request, "You cannot change to editor");
     }
+    if ($data['from_role'] === "super-admin" && $data['to_role'] === "user") {
+      throw new HttpNotFoundException($request, "You cannot change to editor");
+    }
 
-    // Cannot change an editor or user to super-admin
-    if ($data['from_role'] === "user" && $data['to_role'] === "super-admin") {
+    if ($data['from_role'] === "admin" && $data['to_role'] === "super-admin") {
       throw new HttpNotFoundException($request, "You cannot change to super-admin");
     }
     if ($data['from_role'] === "editor" && $data['to_role'] === "super-admin") {
       throw new HttpNotFoundException($request, "You cannot change to super-admin");
     }
-    // if ($data['from_role'] === "user" && $data['to_role'] === "admin") {
-    //   throw new HttpNotFoundException($request, "You cannot change to admin");
-    // }
-    // if ($data['from_role'] === "editor" && $data['to_role'] === "admin") {
-    //   throw new HttpNotFoundException($request, "You cannot change to admin");
-    // }
+    if ($data['from_role'] === "user" && $data['to_role'] === "super-admin") {
+      throw new HttpNotFoundException($request, "You cannot change to super-admin");
+    }
 
-    // Cannot change an editor to user or user to editor
-    // if ($data['from_role'] === "user" && $data['to_role'] === "editor") {
-    //   throw new HttpNotFoundException($request, "You cannot change to editor");
-    // }
-    // if ($data['from_role'] === "editor" && $data['to_role'] === "user") {
-    //   throw new HttpNotFoundException($request, "You cannot change to user");
-    // }
-
-    // Cannot change an admin to user or user to admin
-    // if ($data['from_role'] === "admin" && $data['to_role'] === "user") {
-    //   throw new HttpNotFoundException($request, "You cannot change to user");
-    // }
-    // if ($data['from_role'] === "admin" && $data['to_role'] === "editor") {
-    //   throw new HttpNotFoundException($request, "You cannot change to editor");
-    // }
-
+    // Cannot change a admin to user or editor
+    if ($data['from_role'] === "admin" && $data['to_role'] === "user") {
+      throw new HttpNotFoundException($request, "You cannot change to user");
+    }
+    if ($data['from_role'] === "user" && $data['to_role'] === "admin") {
+      throw new HttpNotFoundException($request, "You cannot change to admin");
+    }
 
     $user = $this->userService->changeRole((int)$data['target_user_id'], $data['to_role']);
     $response->getBody()->write(json_encode($user));

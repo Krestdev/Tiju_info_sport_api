@@ -16,6 +16,7 @@ class CategoryController
   {
     $this->validator->mapFieldsRules([
       'title' => ['required', ['lengthMin', 2]],
+      'slug' => ['required', ['lengthMin', 2]],
       'image' => ['required', ['lengthMin', 2]],
       'description' => ['required', ['lengthMin', 2]],
       'user_id' => ['required', ['lengthMin', 1]],

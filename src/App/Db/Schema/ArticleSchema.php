@@ -35,6 +35,9 @@ class ArticleSchema implements JsonSerializable
   #[Column(type: 'string', length: 255)]
   private string $title;
 
+  #[Column(type: 'string', length: 255)]
+  private string $slug;
+
   #[Column(type: 'string', length: 100)]
   private string $summary;
 
@@ -75,6 +78,7 @@ class ArticleSchema implements JsonSerializable
   {
     $this->author = $user;
     $this->title = $data['title'];
+    $this->slug = $data['slug'];
     $this->type = $data['type'];
     $this->summary = $data['summary'];
     $this->description = $data['description'];
@@ -100,6 +104,7 @@ class ArticleSchema implements JsonSerializable
       'headline' => $this->headline,
       'type' => $this->type,
       'title' => $this->title,
+      'slug' => $this->slug,
       'summery' => $this->summary,
       'description' => $this->description,
       'publish_on' => $this->publish_on ? $this->publish_on->format('Y-m-d H:i:s') : "",
@@ -120,6 +125,7 @@ class ArticleSchema implements JsonSerializable
       'headline' => $this->headline,
       'type' => $this->type,
       'title' => $this->title,
+      'slug' => $this->slug,
       'summery' => $this->summary,
       'description' => $this->description,
       'publish_on' => $this->publish_on ? $this->publish_on->format('Y-m-d H:i:s') : "",
@@ -148,6 +154,11 @@ class ArticleSchema implements JsonSerializable
   public function getTitle(): string
   {
     return $this->title;
+  }
+
+  public function getSlug(): string
+  {
+    return $this->slug;
   }
 
   public function getType(): string
@@ -218,6 +229,11 @@ class ArticleSchema implements JsonSerializable
   public function setTitle(string $title): void
   {
     $this->title = $title;
+  }
+
+  public function setSlug(string $slug): void
+  {
+    $this->slug = $slug;
   }
 
   public function setType(string $type): void
