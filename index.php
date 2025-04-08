@@ -36,7 +36,7 @@ $app->add(function (Request $request, RequestHandler $handler) {
     ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization, x-api-key')
     ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
 });
-require __DIR__ . '/src/App/Middleware/cors/CorsMiddleware.php';
+// require __DIR__ . '/src/App/Middleware/cors/CorsMiddleware.php';
 require __DIR__ . '/src/Routes/routes.php';
 
 $app->run();
