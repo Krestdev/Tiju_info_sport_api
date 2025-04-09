@@ -62,6 +62,7 @@ final class ArticleService
     $article = $this->findById($id);
     $article->setsummary($data['summary']);
     $article->setDescription($data['description']);
+    $article->setStatus($data['status']);
     $article->setTitle($data['title']);
     if (isset($data['publish_on'])) {
       $article->setPublishedOn(new DateTimeImmutable($data['publish_on']));
