@@ -38,7 +38,7 @@ class ArticleSchema implements JsonSerializable
   #[Column(type: 'string', length: 255)]
   private string $slug;
 
-  #[Column(type: 'string', length: 100)]
+  #[Column(type: 'string', length: 255)]
   private string $summary;
 
   #[Column(type: 'text')]
