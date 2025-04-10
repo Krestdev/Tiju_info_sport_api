@@ -45,8 +45,8 @@ class CategorySchema implements JsonSerializable
   #[Column(type: 'string', length: 255)]
   private string $description;
 
-  #[Column(type: 'string', length: 255)]
-  private string $color;
+  #[Column(type: 'string', length: 255, nullable: true)]
+  private ?string $color;
 
   #[Column(type: 'string', length: 255)]
   private string $image;
@@ -67,7 +67,7 @@ class CategorySchema implements JsonSerializable
     $this->author = $user;
     $this->description = $data['description'];
     $this->image = $data['image'];
-    $this->color = $data['color'] ?? 'none';
+    $this->color = $data['color'] ?? null;
     $this->articles = new ArrayCollection();
     $this->createdAt = new DateTimeImmutable();
     $this->updatedAt = new DateTimeImmutable();
