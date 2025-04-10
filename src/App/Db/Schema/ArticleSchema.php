@@ -32,13 +32,13 @@ class ArticleSchema implements JsonSerializable
   #[Column(type: 'boolean', length: 255)]
   private bool $headline;
 
-  #[Column(type: 'string', length: 255)]
+  #[Column(type: 'text', length: 255)]
   private string $title;
 
   #[Column(type: 'string', length: 255)]
   private string $slug;
 
-  #[Column(type: 'string', length: 255)]
+  #[Column(type: 'text')]
   private string $summary;
 
   #[Column(type: 'text')]
