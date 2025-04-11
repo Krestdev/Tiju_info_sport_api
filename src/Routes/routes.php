@@ -11,6 +11,7 @@ use App\Controllers\FooterController;
 use App\Controllers\ImageController;
 use App\Controllers\PackageController;
 use App\Controllers\PaymentController;
+use App\Controllers\SiteInfoController;
 use App\Controllers\SubscriptionController;
 use App\Controllers\UserController;
 use App\Controllers\UserIndex;
@@ -49,6 +50,12 @@ $app->group('/api', function (RouteCollectorProxy $group) {
   $group->post('/users/password-reset/request', [UserController::class, 'requestPasswordReset']);
   $group->post('/users/password-reset/validate', [UserController::class, 'validateToken']);
   $group->post('/users/password-reset/reset', [UserController::class, 'resetPassword']);
+
+  // site param
+  $group->post('/param/create', [SiteInfoController::class, 'create']);
+  $group->get('/param/show', [SiteInfoController::class, 'showAll']);
+  $group->patch('/param/update', [SiteInfoController::class, 'update']);
+  $group->delete('/param/delete', [SiteInfoController::class, 'delete']);
 
   // user Routes
 

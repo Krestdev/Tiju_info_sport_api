@@ -86,7 +86,7 @@ final class UserService
 
   public function validateResetToken(string $token): ?UserSchema
   {
-    return $this->em->getRepository(UserSchema::class)->findOneBy(['reset_token' => $token]);
+    return $this->em->getRepository(UserSchema::class)->findOneBy(['resetToken' => $token]);
   }
 
 

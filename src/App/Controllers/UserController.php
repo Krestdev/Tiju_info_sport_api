@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Db\Repository\UserService;
 use App\Mail\SendMail;
+use DateTimeImmutable;
 use Google\Service\Oauth2;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -199,7 +200,7 @@ class UserController
     $resetToken = $this->userService->generateResetToken($user->getId());
 
     // send mail with reset link
-    $resetLink = join(["http://tyjuinfosport.com/user/restaure-password?token=", $resetToken]);
+    $resetLink = join(["http://localhost:3000/recuperation-mot-de-passe?token=", $resetToken]);
     $this->mailSender->send($user->getEmail(), $user->getUsername(), "Password Reset Request", join(["Click here to reset your password: ", $resetLink]));
     // send verification mail
     $response->getBody()->write(json_encode($user));
@@ -210,15 +211,20 @@ class UserController
   {
 
     $data = $request->getParsedBody();
-    $user = $this->userService->validateResetToken($data->token);
+    $user = $this->userService->validateResetToken($data["token"]);
     if ($user === null) {
-      throw new HttpNotFoundException($request, "Token not valid");
+      throw new HttpNotFoundException($request, "No Token Found");
     }
-    $response->getBody()->write(json_encode('Token is valid'));
-    return $response;
+
+    if ($user->getResetToken() !== null && new DateTimeImmutable() < $user->getResetTokenExpireAt()) {
+      $response->getBody()->write(json_encode('Token is valid'));
+      return $response;
+    }
+
+    throw new HttpNotFoundException($request, "Token not valid");
   }
 
-  public function resetPassword(Request $request, Response $response, string $token): Response
+  public function resetPassword(Request $request, Response $response): Response
   {
     $data = $request->getParsedBody();
 
@@ -226,7 +232,6 @@ class UserController
 
     $validatorNewPassword->mapFieldsRules([
       'password' => ['required', ['lengthMin', 8]],
-      'newPassword' => ['required', ['lengthMin', 8]],
       'token' => ['required']
     ]);
 
@@ -237,11 +242,11 @@ class UserController
       return $response->withStatus(422);
     }
 
-    if (!$token || !$data->newPassword) {
+    if (!$data['token'] || !$data['password']) {
       throw new HttpNotFoundException($request, "Token or new password not provided");
     }
 
-    $user = $this->userService->findByToken($token);
+    $user = $this->userService->findByToken($data['token']);
 
     if (!$user || !$user->isResetTokenValid()) {
       $response->getBody()->write(json_encode('Invalid or expired token'));
@@ -249,7 +254,7 @@ class UserController
     }
 
     // Hash the new password
-    $user = $this->userService->resetPassword($user, $data->newPassword);
+    $user = $this->userService->resetPassword($user, $data["password"]);
 
     $response->getBody()->write(json_encode($user));
     return $response;

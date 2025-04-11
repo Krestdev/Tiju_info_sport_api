@@ -41,13 +41,16 @@ class ImageSchema implements JsonSerializable
   #[OneToOne(targetEntity: UserSchema::class, mappedBy: 'profile', cascade: ['persist', 'remove'])]
   private ?UserSchema $user;
 
+  #[OneToOne(targetEntity: SiteInfoSchema::class, mappedBy: 'logo', cascade: ['persist', 'remove'])]
+  private ?SiteInfoSchema $site;
+
   #[Column(name: "created_at", type: 'datetimetz_immutable', nullable: false)]
   private DateTimeImmutable $createdAt;
 
   #[Column(name: 'updated_at', type: 'datetimetz_immutable', nullable: false)]
   private DateTimeImmutable $updatedAt;
 
-  public function __construct(?UserSchema $user, ?AdsSchema $ads, ?ArticleSchema $article, array $data)
+  public function __construct(?UserSchema $user, ?AdsSchema $ads, ?ArticleSchema $article, ?SiteInfoSchema $siteinfo, array $data)
   {
     $this->size = $data['size'];
     $this->location = $data['location'] ?? null;
@@ -65,6 +68,9 @@ class ImageSchema implements JsonSerializable
     }
     if ($article) {
       $article->addImage($this);
+    }
+    if ($siteinfo) {
+      $siteinfo->setLogo($this);
     }
   }
 
@@ -115,6 +121,11 @@ class ImageSchema implements JsonSerializable
     return $this->article;
   }
 
+  public function getSite(): ?SiteInfoSchema
+  {
+    return $this->site;
+  }
+
   public function getLocation(): string
   {
     return $this->location;
@@ -158,6 +169,11 @@ class ImageSchema implements JsonSerializable
   public function setAds(AdsSchema $ads): void
   {
     $this->advertisment = $ads;
+  }
+
+  public function setSite(SiteInfoSchema $img): void
+  {
+    $this->site = $img;
   }
 
   public function setUpdatedAt(DateTimeImmutable $updatedAt): void

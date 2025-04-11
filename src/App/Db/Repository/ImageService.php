@@ -8,6 +8,7 @@ use App\Db\Schema\AdsSchema;
 use App\Db\Schema\ArticleSchema;
 use App\Db\Schema\ImageSchema;
 use App\Db\Schema\PackageSchema;
+use App\Db\Schema\SiteInfoSchema;
 use App\Db\Schema\UserSchema;
 use Doctrine\ORM\EntityManager;
 
@@ -22,7 +23,7 @@ final class ImageService
 
   public function createBaseImage(array $image): ImageSchema
   {
-    $image = new ImageSchema(null, null, null, $image);
+    $image = new ImageSchema(null, null, null, null, $image);
     $this->em->persist($image);
     $this->em->flush();
     return $image;
@@ -39,7 +40,7 @@ final class ImageService
 
   public function createUserProfile(UserSchema $user, array $image): ImageSchema
   {
-    $image = new ImageSchema($user, null, null, $image);
+    $image = new ImageSchema($user, null, null, null, $image);
     $this->em->persist($image);
     $this->em->flush();
     return $image;
@@ -47,7 +48,15 @@ final class ImageService
 
   public function createAdsImage(AdsSchema $ads, array $image): ImageSchema
   {
-    $image = new ImageSchema(null, $ads, null, $image);
+    $image = new ImageSchema(null, $ads, null, null, $image);
+    $this->em->persist($image);
+    $this->em->flush();
+    return $image;
+  }
+
+  public function createSiteInfoImage(SiteInfoSchema $site_info, array $image): ImageSchema
+  {
+    $image = new ImageSchema(null, null, null, $site_info, $image);
     $this->em->persist($image);
     $this->em->flush();
     return $image;
@@ -95,6 +104,9 @@ final class ImageService
     }
     if ($image->getArticle()) {
       $image->getArticle()->removeImage($image);
+    }
+    if ($image->getSite()) {
+      $image->getSite()->setLogo(null);
     }
     $this->em->remove($image);
     $this->em->flush();

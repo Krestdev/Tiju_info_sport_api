@@ -321,6 +321,11 @@ class UserSchema implements JsonSerializable
     return $this->resetToken;
   }
 
+  public function getResetTokenExpireAt(): ?DateTimeImmutable
+  {
+    return $this->resetTokenExpiresAt;
+  }
+
 
   public function isResetTokenValid(): bool
   {
