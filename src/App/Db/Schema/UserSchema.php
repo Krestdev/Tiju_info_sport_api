@@ -156,6 +156,7 @@ class UserSchema implements JsonSerializable
     return [
       'id' => $this->id,
       'name' => $this->name,
+      "nickName" => $this->nickName,
       'email' => $this->email,
       'phone' => $this->phone,
       'image' => $this->profile,
@@ -178,6 +179,7 @@ class UserSchema implements JsonSerializable
     return [
       'id' => $this->id,
       'name' => $this->name,
+      "nickName" => $this->nickName,
       'email' => $this->email,
       'phone' => $this->phone,
       'image' => $this->profile !== null ? $this->profile->jsonSerializeDeleted() : $this->profile,
@@ -250,7 +252,7 @@ class UserSchema implements JsonSerializable
     return $this->role;
   }
 
-  public function getApiKey(): string
+  public function getApiKey(): ?string
   {
     return $this->api_key;
   }

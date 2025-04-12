@@ -38,9 +38,25 @@ final class UserService
   {
     $user = $this->em->getRepository(UserSchema::class)->findOneBy(['id' => $id]);
     if ($user) {
-      $user->setEmail($data['email']);
-      $hashedPassword = password_hash($data["password"], PASSWORD_BCRYPT);
-      $user->setPassword($hashedPassword);
+      if (isset($data['sex'])) {
+        $user->setSex($data['sex']);
+      }
+      if (isset($data['town'])) {
+        $user->setTown($data['town']);
+      }
+      if (isset($data['country'])) {
+        $user->setCountry($data['country']);
+      }
+      if (isset($data['password'])) {
+        $user->setPassword($data['password']);
+        $hashedPassword = password_hash($data["password"], PASSWORD_BCRYPT);
+      }
+      if (isset($data['name'])) {
+        $user->setName($data['name']);
+      }
+      if (isset($data['phone'])) {
+        $user->setPhone($data['phone']);
+      }
       $this->em->persist($user);
       $this->em->flush();
       $this->em->refresh($user);

@@ -50,7 +50,7 @@ final class SiteInfoService
     $siteInfo->setAddress($data['address']);
     $siteInfo->setFacebook($data['facebook']);
     $siteInfo->setX($data['x']);
-    $siteInfo->setCompany($data['conmpany']);
+    $siteInfo->setCompany($data['company']);
     $siteInfo->setPhone($data['phone']);
     $siteInfo->setEmail($data['email']);
     $this->em->persist($siteInfo);

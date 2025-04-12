@@ -54,7 +54,8 @@ class SiteInfoController
     $data = $request->getParsedBody();
     $this->validator = $this->validator->withData($data);
     if (!$this->validator->validate()) {
-      $response->getBody()->write(json_encode($this->validator->errors()));
+
+      $response->getBody()->write(json_encode(["errors" => $this->validator->errors(), "data" => $data],));
       return $response->withStatus(422);
     }
     $article = $this->siteInfoService->update((int)$company_id, $data);

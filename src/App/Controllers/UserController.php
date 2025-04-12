@@ -41,11 +41,11 @@ class UserController
   {
     $user = $request->getAttribute('user');
 
-    $encription_key = Key::loadFromAsciiSafeString($_ENV['ENCRYPTION_KEY']);
-    $api_key = Crypto::encrypt($user->getApiKey(), $encription_key);
+    // $encription_key = Key::loadFromAsciiSafeString($_ENV['ENCRYPTION_KEY']);
+    // $api_key = Crypto::encrypt($user->getApiKey(), $encription_key);
     $response->getBody()->write(json_encode([
       "user" => $user,
-      "api key" => $api_key
+      // "api key" => $api_key
     ]));
     return $response;
   }
@@ -165,9 +165,6 @@ class UserController
     if ($data['from_role'] === "admin" && $data['to_role'] === "user") {
       throw new HttpNotFoundException($request, "You cannot change to user");
     }
-    if ($data['from_role'] === "user" && $data['to_role'] === "admin") {
-      throw new HttpNotFoundException($request, "You cannot change to admin");
-    }
 
     $user = $this->userService->changeRole((int)$data['target_user_id'], $data['to_role']);
     $response->getBody()->write(json_encode($user));
@@ -264,10 +261,17 @@ class UserController
   {
     $data = $request->getParsedBody();
 
+    $validator = new Validator($data);
+    $validator->mapFieldsRules([
+      'name' => [['lengthMin', 2]],
+      'email' => ['email'],
+      'password' => [['lengthMin', 8]]
+    ]);
+
     // validate the data
-    $this->validator = $this->validator->withData($data);
-    if (!$this->validator->validate()) {
-      $response->getBody()->write(json_encode($this->validator->errors()));
+    $validator = $validator->withData($data);
+    if (!$validator->validate()) {
+      $response->getBody()->write(json_encode($validator->errors()));
       return $response->withStatus(422);
     }
 
