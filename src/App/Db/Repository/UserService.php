@@ -39,7 +39,8 @@ final class UserService
     $user = $this->em->getRepository(UserSchema::class)->findOneBy(['id' => $id]);
     if ($user) {
       $user->setEmail($data['email']);
-      $user->setPassword($data['password']);
+      $hashedPassword = password_hash($data["password"], PASSWORD_BCRYPT);
+      $user->setPassword($hashedPassword);
       $this->em->persist($user);
       $this->em->flush();
       $this->em->refresh($user);
