@@ -54,8 +54,8 @@ $app->group('/api', function (RouteCollectorProxy $group) {
   // site param
   $group->post('/param/create', [SiteInfoController::class, 'create']);
   $group->get('/param/show', [SiteInfoController::class, 'showAll']);
-  $group->patch('/param/update', [SiteInfoController::class, 'update']);
-  $group->delete('/param/delete', [SiteInfoController::class, 'delete']);
+  $group->patch('/param/update/{company_id:[0-9]+}', [SiteInfoController::class, 'update']);
+  $group->delete('/param/delete/{company_id:[0-9]+}', [SiteInfoController::class, 'delete']);
 
   // user Routes
 
