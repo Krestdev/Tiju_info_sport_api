@@ -19,7 +19,7 @@ class ContentService
 
   public function create(FooterSectionSchema $footerSection, array $data): ContentSchema
   {
-    $content = new ContentSchema($footerSection, $data['title'], $data['url']);
+    $content = new ContentSchema($footerSection, $data['title'], $data['url'], $data['content'], (int)$data['catid']);
     $this->em->persist($content);
     $this->em->flush();
     return $content;
@@ -31,6 +31,8 @@ class ContentService
     if ($content) {
       $content->setTitle($data['title']);
       $content->setUrl($data['url']);
+      $content->setContent($data['content']);
+      $content->setCatId($data['catid']);
       $this->em->persist($content);
       $this->em->flush();
       return $content;

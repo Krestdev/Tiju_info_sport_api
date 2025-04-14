@@ -27,11 +27,19 @@ class ContentSchema implements JsonSerializable
   #[Column(type: 'string', length: 255)]
   private string $url;
 
-  public function __construct(FooterSectionSchema $section, string $title, string $url)
+  #[Column(type: 'text')]
+  private string $content;
+
+  #[Column(type: 'integer')]
+  private int $catid;
+
+  public function __construct(FooterSectionSchema $section, string $title, string $url, string $content, int $catid)
   {
     $this->section = $section;
     $this->title = $title;
+    $this->catid = $catid;
     $this->url = $url;
+    $this->content = $content;
 
     $section->addContent($this);
   }
@@ -39,6 +47,11 @@ class ContentSchema implements JsonSerializable
   public function getId(): int
   {
     return $this->id;
+  }
+
+  public function getCatId(): int
+  {
+    return $this->catid;
   }
 
   public function getSection(): FooterSectionSchema
@@ -61,6 +74,10 @@ class ContentSchema implements JsonSerializable
     $this->section = $section;
   }
 
+  public function setCatId(int $catid): void
+  {
+    $this->catid = $catid;
+  }
   public function setTitle(string $title): void
   {
     $this->title = $title;
@@ -71,11 +88,18 @@ class ContentSchema implements JsonSerializable
     $this->url = $url;
   }
 
+  public function setContent(string $content): void
+  {
+    $this->content = $content;
+  }
+
   public function jsonSerialize(): array
   {
     return [
       'id' => $this->id,
       'section' => $this->section->getId(),
+      'content' => $this->content,
+      'catid' => $this->catid,
       'title' => $this->title,
       'url' => $this->url,
     ];
