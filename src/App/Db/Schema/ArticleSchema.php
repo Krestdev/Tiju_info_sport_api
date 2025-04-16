@@ -82,7 +82,7 @@ class ArticleSchema implements JsonSerializable
     $this->type = $data['type'];
     $this->summary = $data['summary'];
     $this->description = $data['description'];
-    $this->publish_on = $data['publish_on'] ? new DateTimeImmutable($data['publish_on']) : null;
+    $this->publish_on = isset($data['publish_on']) ? new DateTimeImmutable($data['publish_on']) : null;
     $this->status = $data["status"];
     $this->headline = (bool)$data['headline'] ?? false;
     $this->category = $category;
