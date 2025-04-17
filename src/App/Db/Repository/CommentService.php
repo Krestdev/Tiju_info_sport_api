@@ -51,7 +51,7 @@ final class CommentService
   public function delete(int $id): ?array
   {
     $comment = $this->em->getRepository(CommentSchema::class)->findOneBy(['id' => $id]);
-    $commentData = $comment->jsonSerialize();
+    $commentData = $comment->jsonSerializeDelete();
     $this->em->remove($comment);
     $this->em->flush();
 
