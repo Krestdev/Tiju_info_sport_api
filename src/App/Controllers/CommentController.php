@@ -15,7 +15,7 @@ class CommentController
   public function __construct(private CommentService $commentService, private UserService $userService, private Validator $validator)
   {
     $this->validator->mapFieldsRules([
-      'user_id' => ['required', ['lengthMin', 1]],
+      'user_id' => ['required', 'integer'],
       // 'article_id' => ['required', ['lengthMin', 1]],
       'message' => ['required', ['lengthMin', 1]]
     ]);

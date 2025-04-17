@@ -63,6 +63,13 @@ final class ArticleService
     $article->setsummary($data['summary']);
     $article->setDescription($data['description']);
     $article->setStatus($data['status']);
+    if (isset($data['catid'])) {
+      $cat = $this->em->getRepository(CategorySchema::class)->find((int)$data['catid']);
+      $article->setCategory($cat);
+    }
+    if (isset($data['type'])) {
+      $article->setType($data['type']);
+    }
     $article->setTitle($data['title']);
     if (isset($data['publish_on'])) {
       $article->setPublishedOn(new DateTimeImmutable($data['publish_on']));
