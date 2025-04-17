@@ -15,6 +15,8 @@ $container = require __DIR__ . '/config/ContainerDI.php';
 AppFactory::setContainer($container);
 $app = AppFactory::create();
 
+date_default_timezone_set('Africa/Douala'); // Or your preferred timezone
+
 $collector = $app->getRouteCollector();
 $collector->setDefaultInvocationStrategy(new RequestResponseNamedArgs);
 

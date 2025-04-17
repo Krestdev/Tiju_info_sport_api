@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Db\Schema;
 
 use DateTimeImmutable;
+use DateTimeZone;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Column;
@@ -76,13 +77,14 @@ class ArticleSchema implements JsonSerializable
 
   public function __construct(UserSchema $user, CategorySchema $category, array $data)
   {
+    $timezone = new DateTimeZone('Africa/Douala');
     $this->author = $user;
     $this->title = $data['title'];
     $this->slug = $data['slug'];
     $this->type = $data['type'];
     $this->summary = $data['summary'];
     $this->description = $data['description'];
-    $this->publish_on = isset($data['publish_on']) ? new DateTimeImmutable($data['publish_on']) : null;
+    $this->publish_on = isset($data['publish_on']) ? new DateTimeImmutable($data['publish_on'], $timezone) : null;
     $this->status = $data["status"];
     $this->headline = (bool)$data['headline'] ?? false;
     $this->category = $category;
