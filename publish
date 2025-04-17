@@ -10,6 +10,8 @@ use Doctrine\ORM\EntityManager;
 $container = require_once __DIR__ . '/config/ContainerDI.php';
 $em = $container->get(EntityManager::class);
 
+$timezone = new DateTimeZone('Africa/Douala');
+
 // Get all "programmed" articles that should be published
 $qb = $em->createQueryBuilder();
 $qb->select('a')
@@ -17,7 +19,7 @@ $qb->select('a')
   ->where('a.status = :status')
   ->andWhere('a.publish_on <= :now')
   ->setParameter('status', 'draft')
-  ->setParameter('now', new \DateTime());
+  ->setParameter('now', new DateTime('now', $timezone));
 
 $articles = $qb->getQuery()->getResult();
 
