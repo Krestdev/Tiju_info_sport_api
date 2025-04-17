@@ -1,0 +1,31 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__ . '/vendor/autoload.php';
+
+use App\Db\Schema\ArticleSchema;
+use Doctrine\ORM\EntityManager;
+
+/** @var Container $container */
+$container = require_once __DIR__ . '/config/ContainerDI.php';
+$em = $container->get(EntityManager::class);
+
+// Get all "programmed" articles that should be published
+$qb = $em->createQueryBuilder();
+$qb->select('a')
+  ->from(ArticleSchema::class, 'a')
+  ->where('a.status = :status')
+  ->andWhere('a.publish_on <= :now')
+  ->setParameter('status', 'draft')
+  ->setParameter('now', new \DateTime());
+
+$articles = $qb->getQuery()->getResult();
+
+// Update their status
+foreach ($articles as $article) {
+  $article->setStatus('published');
+}
+
+$em->flush();
+
+echo "Published " . count($articles) . " article(s).\n";
