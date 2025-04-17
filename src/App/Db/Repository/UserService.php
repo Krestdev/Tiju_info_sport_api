@@ -48,8 +48,8 @@ final class UserService
         $user->setCountry($data['country']);
       }
       if (isset($data['password'])) {
-        $user->setPassword($data['password']);
         $hashedPassword = password_hash($data["password"], PASSWORD_BCRYPT);
+        $user->setPassword($hashedPassword);
       }
       if (isset($data['name'])) {
         $user->setName($data['name']);
