@@ -61,6 +61,7 @@ $app->group('/api', function (RouteCollectorProxy $group) {
 
   $group->get('/users', UserIndex::class);
   $group->post('/users', [UserController::class, 'signup'])->add(StartSession::class);
+  $group->post('/users/create', [UserController::class, 'createUser'])->add(StartSession::class);
   $group->get('/profile/{user_id:[0-9]+}', [UserController::class, 'show'])->add(GetUser::class);
 
   $group->post('/users/signin', [UserController::class, 'signIn'])->add(StartSession::class);

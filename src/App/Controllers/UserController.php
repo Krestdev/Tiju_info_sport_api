@@ -88,6 +88,31 @@ class UserController
     return $response;
   }
 
+  public function createUser(Request $request, Response $response): Response
+  {
+    $data = $request->getParsedBody();
+
+    // validate the data
+    $this->validator = $this->validator->withData($data);
+    if (!$this->validator->validate()) {
+      $response->getBody()->write(json_encode($this->validator->errors()));
+      return $response->withStatus(422);
+    }
+
+    $user = $this->userService->findbyEmail($data['email']);
+
+    if ($user !== null) {
+      throw new HttpNotFoundException($request, "email address taken");
+    }
+
+    $data["password"] = password_hash($data["password"], PASSWORD_DEFAULT);
+
+    $user = $this->userService->signUp($data);
+    // send verification mail
+    $response->getBody()->write(json_encode($user));
+    return $response;
+  }
+
   public function signIn(Request $request, Response $response): Response
   {
     $data = $request->getParsedBody();
