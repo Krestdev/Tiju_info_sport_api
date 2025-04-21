@@ -8,6 +8,7 @@ use App\Db\Repository\AdsService;
 use App\Db\Repository\ArticleService;
 use App\Db\Repository\ImageService;
 use App\Db\Repository\UserService;
+use DateTime;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -86,6 +87,28 @@ class ImageController
       }
 
       $response->getBody()->write(json_encode($image));
+
+      return $response->withStatus(201)->withHeader('Content-Type', 'application/json');;
+    } catch (Exception $error) {
+      return $response->withStatus(500)->withHeader('Content-Type', 'application/json');;
+    }
+  }
+
+  public function saveImage(Request $request, Response $response): Response
+  {
+    $files = $request->getUploadedFiles();
+    $file = $this->validateData($files, $response);
+
+    $date = new DateTime();
+
+    try {
+      $type = explode("/", $file->getClientMediaType());
+
+      $location = "/uploads/images/" . $date->format('Y-m-d_H-i-s') . "." . end($type);
+
+      $file->moveTo(dirname(__DIR__, 3) . $location);
+
+      $response->getBody()->write(json_encode($location));
 
       return $response->withStatus(201)->withHeader('Content-Type', 'application/json');;
     } catch (Exception $error) {

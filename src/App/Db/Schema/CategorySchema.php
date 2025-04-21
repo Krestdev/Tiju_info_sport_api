@@ -51,6 +51,9 @@ class CategorySchema implements JsonSerializable
   #[Column(type: 'string', length: 255)]
   private string $image;
 
+  #[Column(type: 'boolean', length: 255)]
+  private bool $footershow = false;
+
   #[OneToMany(targetEntity: ArticleSchema::class, mappedBy: 'category', cascade: ['persist', 'remove'], orphanRemoval: true)]
   private Collection $articles;
 
@@ -84,6 +87,7 @@ class CategorySchema implements JsonSerializable
       'author' => $this->author,
       'description' => $this->description,
       'color' => $this->color,
+      'footershow' => $this->footershow,
       'parent' => $this?->parent?->getId(),
       'image' => $this->image,
       'articles' => $this->articles->toArray(),
@@ -101,6 +105,7 @@ class CategorySchema implements JsonSerializable
       'author' => $this->author,
       'description' => $this->description,
       'color' => $this->color,
+      'footershow' => $this->footershow,
       'image' => $this->image,
       'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
       'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
@@ -145,6 +150,11 @@ class CategorySchema implements JsonSerializable
     return $this->description;
   }
 
+  public function getFooterShow(): bool
+  {
+    return $this->footershow;
+  }
+
   public function getImage(): string
   {
     return $this->image;
@@ -168,6 +178,11 @@ class CategorySchema implements JsonSerializable
   public function setSlug(string $title): void
   {
     $this->title = $title;
+  }
+
+  public function setFooterShow(bool $footershow): void
+  {
+    $this->footershow = $footershow;
   }
 
   public function setColor(string $color): void

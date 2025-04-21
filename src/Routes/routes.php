@@ -172,6 +172,7 @@ $app->group('/api', function (RouteCollectorProxy $group) {
 // images
 $app->group('/api', function (RouteCollectorProxy $group) {
   $group->post('/image', [ImageController::class, 'save'])->add(GetImageOwner::class);
+  $group->post('/image/url', [ImageController::class, 'saveImage']);
   $group->get('/image/{image_id:[0-9]+}', [ImageController::class, 'read'])->add(GetImage::class);
   $group->post('/image/{image_id:[0-9]+}', [ImageController::class, 'updateImage'])->add(GetImage::class)->add(GetImageOwner::class);
   $group->delete('/image/{image_id:[0-9]+}', [ImageController::class, 'deleteImage'])->add(GetImage::class);

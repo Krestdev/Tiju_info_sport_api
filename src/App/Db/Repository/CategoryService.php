@@ -50,10 +50,19 @@ final class CategoryService
     $category = $this->findById($id);
     $category->setTitle($data['title']);
     $category->setDescription($data['description']);
+
     if (isset($data['color'])) {
       $category->setColor($data['color']);
     }
-    $category->setImage($data['image']);
+
+    if (isset($data['footershow'])) {
+      $category->setFooterShow((bool)$data['footershow']);
+    }
+
+    if (isset($data['image'])) {
+      $category->setImage($data['image']);
+    }
+
     $this->em->persist($category);
     $this->em->flush();
     return $category;
