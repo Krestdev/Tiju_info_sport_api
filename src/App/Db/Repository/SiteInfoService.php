@@ -48,13 +48,13 @@ final class SiteInfoService
     $siteInfo = $this->findById($id);
     $siteInfo->setDescription($data['description']);
     $siteInfo->setAddress($data['address']);
-    isset($data['facebook']) ?? $siteInfo->setFacebook($data['facebook']);
-    isset($data['x']) ?? $siteInfo->setX($data['x']);
-    isset($data['instagram']) ?? $siteInfo->setInstagram($data['instagram']);
+    isset($data['facebook']) && $siteInfo->setFacebook($data['facebook']);
+    isset($data['x']) && $siteInfo->setX($data['x']);
+    isset($data['instagram']) && $siteInfo->setInstagram($data['instagram']);
     $siteInfo->setCompany($data['company']);
-    isset($data['phone']) ?? $siteInfo->setPhone($data['phone']);
+    isset($data['phone']) && $siteInfo->setPhone($data['phone']);
     $siteInfo->setEmail($data['email']);
-    isset($data['imageurl']) ?? $siteInfo->setImageurl($data['imageurl']);
+    isset($data['imageurl']) && $siteInfo->setImageurl($data['imageurl']);
 
     $this->em->persist($siteInfo);
     $this->em->flush();
