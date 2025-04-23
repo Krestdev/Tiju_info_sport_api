@@ -32,25 +32,25 @@ class SiteInfoSchema implements JsonSerializable
   private string $email;
 
   #[Column(type: 'string', length: 255, nullable: true)]
-  private string $phone;
+  private ?string $phone;
 
   #[Column(type: 'string', length: 255, nullable: true)]
   private string $address;
 
   #[Column(type: 'string', length: 255, nullable: true)]
-  private string $facebook;
+  private ?string $facebook;
 
   #[Column(type: 'string', length: 255, nullable: true)]
-  private string $instagram;
+  private ?string $instagram;
 
   #[Column(type: 'string', length: 255, nullable: true)]
-  private string $x;
+  private ?string $x;
 
   #[Column(type: 'text', nullable: true)]
   private string $description;
 
-  #[OneToOne(targetEntity: ImageSchema::class, inversedBy: 'site', cascade: ['persist', 'remove'])]
-  private ?ImageSchema $logo;
+  #[Column(type: 'string', nullable: true)]
+  private string $logo;
 
   #[Column(name: "created_at", type: 'datetimetz_immutable', nullable: false)]
   private DateTimeImmutable $createdAt;
@@ -62,10 +62,10 @@ class SiteInfoSchema implements JsonSerializable
   {
     $this->phone = $data["phone"];
     $this->address = $data["address"];
-    $this->facebook = $data["facebook"];
-    $this->instagram = $data["instagram"];
-    $this->x = $data["x"];
-    $this->logo = null;
+    $this->facebook = $data["facebook"] ?? null;
+    $this->instagram = $data["instagram"] ?? null;
+    $this->x = $data["x"] ?? null;
+    $this->logo = $data["logo"];
     $this->description = $data["description"];
     $this->createdAt = new DateTimeImmutable();
     $this->updatedAt = new DateTimeImmutable();
@@ -160,7 +160,7 @@ class SiteInfoSchema implements JsonSerializable
   }
 
 
-  public function setLogo(?ImageSchema $logo): void
+  public function setLogo(string $logo): void
   {
     $this->logo = $logo;
   }

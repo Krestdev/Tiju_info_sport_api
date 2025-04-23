@@ -48,8 +48,9 @@ final class SiteInfoService
     $siteInfo = $this->findById($id);
     $siteInfo->setDescription($data['description']);
     $siteInfo->setAddress($data['address']);
-    $siteInfo->setFacebook($data['facebook']);
-    $siteInfo->setX($data['x']);
+    isset($data['facebook']) ?? $siteInfo->setFacebook($data['facebook']);
+    isset($data['x']) ?? $siteInfo->setX($data['x']);
+    isset($data['instagram']) ?? $siteInfo->setInstagram($data['instagram']);
     $siteInfo->setCompany($data['company']);
     $siteInfo->setPhone($data['phone']);
     $siteInfo->setEmail($data['email']);

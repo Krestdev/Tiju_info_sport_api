@@ -20,9 +20,9 @@ class SiteInfoController
       'email' => ['required', ['lengthMin', 2]],
       'phone' => ['required', ['lengthMin', 2]],
       'address' => ['required', ['lengthMin', 2]],
-      'facebook' => ['required', ['lengthMin', 2]],
-      'instagram' => ['required', ['lengthMin', 2]],
-      'x' => ['required', ['lengthMin', 2]],
+      'facebook' => [['lengthMin', 2]],
+      'instagram' => [['lengthMin', 2]],
+      'x' => [['lengthMin', 2]],
       'description' => ['required', ['lengthMin', 2]]
     ]);
   }
