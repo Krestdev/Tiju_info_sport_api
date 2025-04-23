@@ -77,6 +77,12 @@ final class ArticleService
     if (isset($data['headline'])) {
       $article->setHeadline($data['headline']);
     }
+    if (isset($data['imageurl'])) {
+      $article->setImageurl($data['imageurl']);
+    }
+    if (isset($data['headline'])) {
+      $article->setHeadline($data['headline']);
+    }
     $this->em->persist($article);
     $this->em->flush();
     return $article;
