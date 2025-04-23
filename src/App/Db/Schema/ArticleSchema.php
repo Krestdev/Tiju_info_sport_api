@@ -42,6 +42,9 @@ class ArticleSchema implements JsonSerializable
   #[Column(type: 'text')]
   private string $summary;
 
+  #[Column(type: 'text')]
+  private string $imageurl;
+
   #[Column(type: 'text', columnDefinition: 'LONGTEXT')]
   private string $description;
 
@@ -84,6 +87,7 @@ class ArticleSchema implements JsonSerializable
     $this->type = $data['type'];
     $this->summary = $data['summary'];
     $this->description = $data['description'];
+    $this->imageurl = $data['imageurl'];
     $this->publish_on = isset($data['publish_on']) ? new DateTimeImmutable($data['publish_on'], $timezone) : null;
     $this->status = $data["status"];
     $this->headline = (bool)$data['headline'] ?? false;
@@ -106,6 +110,7 @@ class ArticleSchema implements JsonSerializable
       'headline' => $this->headline,
       'type' => $this->type,
       'title' => $this->title,
+      'imageurl' => $this->imageurl,
       'slug' => $this->slug,
       'summery' => $this->summary,
       'catid' => $this->category->getId(),
@@ -128,6 +133,7 @@ class ArticleSchema implements JsonSerializable
       'headline' => $this->headline,
       'type' => $this->type,
       'title' => $this->title,
+      'imageurl' => $this->imageurl,
       'slug' => $this->slug,
       'summery' => $this->summary,
       'catid' => $this->category->getId(),
@@ -158,6 +164,11 @@ class ArticleSchema implements JsonSerializable
   public function getTitle(): string
   {
     return $this->title;
+  }
+
+  public function getImageurl(): string
+  {
+    return $this->imageurl;
   }
 
   public function getSlug(): string
@@ -233,6 +244,11 @@ class ArticleSchema implements JsonSerializable
   public function setTitle(string $title): void
   {
     $this->title = $title;
+  }
+
+  public function setImageurl(string $imageurl): void
+  {
+    $this->imageurl = $imageurl;
   }
 
   public function setSlug(string $slug): void

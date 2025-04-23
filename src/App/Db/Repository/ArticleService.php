@@ -26,7 +26,7 @@ final class ArticleService
 
   public function create(UserSchema $user, CategorySchema $category, array $data): ArticleSchema
   {
-    $data["status"] = "draft";
+    $data["status"] = $data["status"] ?? "draft";
     $article = new ArticleSchema($user, $category, $data);
     $this->em->persist($article);
     $this->em->flush();

@@ -75,6 +75,7 @@ class SiteInfoSchema implements JsonSerializable
   {
     return [
       'id' => $this->id,
+      'company' => $this->company,
       'phone' => $this->phone,
       'email' => $this->email,
       'logo' => $this->logo ?? null,
@@ -92,6 +93,7 @@ class SiteInfoSchema implements JsonSerializable
   {
     return [
       'id' => $this->id,
+      'company' => $this->company,
       'address' => $this->address,
       'facebook' => $this->facebook,
       'instagram' => $this->instagram,

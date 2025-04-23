@@ -15,11 +15,14 @@ class ArticleController
   public function __construct(private ArticleService $articleService, private UserService $userService, private Validator $validator)
   {
     $this->validator->mapFieldsRules([
-      'title' => ['required', ['lengthMin', 2]],
+      'title' => ['required', ['lengthMin', 1]],
+      'slug' => ['required', ['lengthMin', 2]],
+      'category_id' => ['required', ['integer']],
       'summary' => ['required', ['lengthMin', 2]],
       'description' => ['required', ['lengthMin', 2]],
       'type' => ['required', ['lengthMin', 2]],
-      'user_id' => ['required', ['lengthMin', 1]],
+      'imageurl' => ['required', ['lengthMin', 2]],
+      'user_id' => ['required', ['integer']],
       'publish_on' => ['date']
     ]);
   }
