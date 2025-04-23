@@ -18,7 +18,7 @@ class SiteInfoController
       'company' => ['required', ['lengthMin', 2]],
       'logo' => ['required', ['lengthMin', 2]],
       'email' => ['required', ['lengthMin', 2]],
-      'phone' => ['required', ['lengthMin', 2]],
+      'phone' => [['lengthMin', 2]],
       'address' => ['required', ['lengthMin', 2]],
       'facebook' => [['lengthMin', 2]],
       'instagram' => [['lengthMin', 2]],
