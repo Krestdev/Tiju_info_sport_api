@@ -52,7 +52,7 @@ final class SiteInfoService
     isset($data['x']) ?? $siteInfo->setX($data['x']);
     isset($data['instagram']) ?? $siteInfo->setInstagram($data['instagram']);
     $siteInfo->setCompany($data['company']);
-    $siteInfo->setPhone($data['phone']);
+    isset($data['phone']) ?? $siteInfo->setPhone($data['phone']);
     $siteInfo->setEmail($data['email']);
     $this->em->persist($siteInfo);
     $this->em->flush();
