@@ -40,8 +40,6 @@ class ImageSchema implements JsonSerializable
 
   #[OneToOne(targetEntity: UserSchema::class, mappedBy: 'profile', cascade: ['persist', 'remove'])]
   private ?UserSchema $user;
-
-  #[OneToOne(targetEntity: SiteInfoSchema::class, mappedBy: 'logo', cascade: ['persist', 'remove'])]
   private ?SiteInfoSchema $site;
 
   #[Column(name: "created_at", type: 'datetimetz_immutable', nullable: false)]
@@ -68,9 +66,6 @@ class ImageSchema implements JsonSerializable
     }
     if ($article) {
       $article->addImage($this);
-    }
-    if ($siteinfo) {
-      $siteinfo->setLogo($this);
     }
   }
 

@@ -16,7 +16,7 @@ class SiteInfoController
   {
     $this->validator->mapFieldsRules([
       'company' => ['required', ['lengthMin', 2]],
-      'logo' => ['required', ['lengthMin', 2]],
+      'imageurl' => ['required', ['lengthMin', 2]],
       'email' => ['required', ['lengthMin', 2]],
       'phone' => [['lengthMin', 2]],
       'address' => ['required', ['lengthMin', 2]],

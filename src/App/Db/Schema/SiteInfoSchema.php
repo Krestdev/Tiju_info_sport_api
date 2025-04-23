@@ -50,7 +50,7 @@ class SiteInfoSchema implements JsonSerializable
   private string $description;
 
   #[Column(type: 'string', nullable: true)]
-  private string $logo;
+  private string $imageurl;
 
   #[Column(name: "created_at", type: 'datetimetz_immutable', nullable: false)]
   private DateTimeImmutable $createdAt;
@@ -65,7 +65,7 @@ class SiteInfoSchema implements JsonSerializable
     $this->facebook = $data["facebook"] ?? null;
     $this->instagram = $data["instagram"] ?? null;
     $this->x = $data["x"] ?? null;
-    $this->logo = $data["logo"];
+    $this->imageurl = $data["imageurl"];
     $this->description = $data["description"];
     $this->createdAt = new DateTimeImmutable();
     $this->updatedAt = new DateTimeImmutable();
@@ -78,7 +78,7 @@ class SiteInfoSchema implements JsonSerializable
       'company' => $this->company,
       'phone' => $this->phone,
       'email' => $this->email,
-      'logo' => $this->logo,
+      'imageurl' => $this->imageurl,
       'address' => $this->address,
       'facebook' => $this->facebook,
       'instagram' => $this->instagram,
@@ -109,9 +109,9 @@ class SiteInfoSchema implements JsonSerializable
     return $this->id;
   }
 
-  public function getLogo(): ?string
+  public function getimageurl(): ?string
   {
-    return $this->logo;
+    return $this->imageurl;
   }
 
   public function getPhone(): ?string
@@ -160,9 +160,9 @@ class SiteInfoSchema implements JsonSerializable
   }
 
 
-  public function setLogo(string $logo): void
+  public function setimageurl(string $imageurl): void
   {
-    $this->logo = $logo;
+    $this->imageurl = $imageurl;
   }
 
   public function setDescription(string $description): void
