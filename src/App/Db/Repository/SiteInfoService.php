@@ -54,6 +54,7 @@ final class SiteInfoService
     $siteInfo->setCompany($data['company']);
     isset($data['phone']) ?? $siteInfo->setPhone($data['phone']);
     $siteInfo->setEmail($data['email']);
+    isset($data['logo']) ?? $siteInfo->setLogo($data['logo']);
     $this->em->persist($siteInfo);
     $this->em->flush();
     return $siteInfo;

@@ -78,7 +78,7 @@ class SiteInfoSchema implements JsonSerializable
       'company' => $this->company,
       'phone' => $this->phone,
       'email' => $this->email,
-      'logo' => $this->logo ?? null,
+      'logo' => $this->logo,
       'address' => $this->address,
       'facebook' => $this->facebook,
       'instagram' => $this->instagram,
