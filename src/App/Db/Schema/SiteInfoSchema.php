@@ -61,6 +61,7 @@ class SiteInfoSchema implements JsonSerializable
   public function __construct(array $data)
   {
     $this->phone = $data["phone"];
+    $this->company = $data["company"];
     $this->address = $data["address"];
     $this->facebook = $data["facebook"] ?? null;
     $this->instagram = $data["instagram"] ?? null;
