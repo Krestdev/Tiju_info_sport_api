@@ -275,18 +275,16 @@ class UserController
     throw new HttpNotFoundException($request, "Token not valid");
   }
 
-  public function validateVerificationToken(Request $request, Response $response): Response
+  public function verifyEmail(Request $request, Response $response, string $token): Response
   {
-
-    $data = $request->getParsedBody();
-    $user = $this->userService->validateResetToken($data["token"]);
+    $user = $this->userService->validateResetToken($token);
     if ($user === null) {
       throw new HttpNotFoundException($request, "No Token Found");
     }
 
     if ($user->getVerificationToken() !== null && new DateTimeImmutable() < $user->getResetTokenExpireAt()) {
       $this->userService->verifyEmail($user);
-      $response->getBody()->write(json_encode('Token is valid'));
+      $response->getBody()->write(json_encode(['message' => 'Token is valid', 'user' => $user]));
       return $response;
     }
 
