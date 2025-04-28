@@ -52,6 +52,7 @@ $app->group('/api', function (RouteCollectorProxy $group) {
   $group->post('/users/password-reset/validate', [UserController::class, 'validateToken']);
   $group->post('/users/password-reset/reset', [UserController::class, 'resetPassword']);
 
+  $group->get('/users/verify/link', [UserController::class, 'resendVerification']);
   $group->get('/users/verify/{token}', [UserController::class, 'verifyEmail']);
 
   // site param

@@ -10,6 +10,7 @@ use DateTimeImmutable;
 use Google\Service\Oauth2;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Slim\Exception\HttpBadRequestException;
 use Slim\Exception\HttpNotFoundException;
 use Valitron\Validator;
 use Defuse\Crypto\Crypto;
@@ -63,13 +64,6 @@ class UserController
 
     $user = $this->userService->findbyEmail($data['email']);
 
-    if ($user !== null && !$user->getVerified()) {
-      $expired = $user->getVerificationTokenExpireAt() < new DateTimeImmutable();
-      $token = $expired ? $this->userService->generateVerificationToken($user->getId()) : $user->getVerificationToken();
-
-      $this->mailSender->send($user->getEmail(), $user->getUsername(), "Email verification", "Click here to verify your email: https://www.tyjuinfosport.com/recuperation-mot-de-passe?token=" . $token);
-    }
-
     if ($user !== null) {
       throw new HttpNotFoundException($request, "email address taken");
     }
@@ -95,7 +89,7 @@ class UserController
     $resetToken = $this->userService->generateVerificationToken($user->getId());
 
     // send verification mail
-    $resetLink = join(["https://www.tyjuinfosport.com/recuperation-mot-de-passe?token=", $resetToken]);
+    $resetLink = join(["http://localhost:3000/authentification?token=", $resetToken]);
     $this->mailSender->send($user->getEmail(), $user->getUsername(), "Email verification", join(["Click here to verify your email: ", $resetLink]));
 
     $response->getBody()->write(json_encode($user));
@@ -115,13 +109,6 @@ class UserController
 
     $user = $this->userService->findbyEmail($data['email']);
 
-    if ($user !== null && !$user->getVerified()) {
-      $expired = $user->getVerificationTokenExpireAt() < new DateTimeImmutable();
-      $token = $expired ? $this->userService->generateVerificationToken($user->getId()) : $user->getVerificationToken();
-
-      $this->mailSender->send($user->getEmail(), $user->getUsername(), "Email verification", "Click here to verify your email: https://www.tyjuinfosport.com/recuperation-mot-de-passe?token=" . $token);
-    }
-
     if ($user !== null) {
       throw new HttpNotFoundException($request, "email address taken");
     }
@@ -135,11 +122,29 @@ class UserController
 
     // send verification mail
 
-    $resetLink = join(["https://www.tyjuinfosport.com/recuperation-mot-de-passe?token=", $resetToken]);
+    $resetLink = join(["http://localhost:3000/authentification?token=", $resetToken]);
     $this->mailSender->send($user->getEmail(), $user->getUsername(), "Email verification", join(["Click here to verify your email: ", $resetLink]));
 
     $response->getBody()->write(json_encode($user));
     return $response;
+  }
+
+  public function resendVerification(Request $request, Response $response)
+  {
+    $data = $request->getParsedBody();
+    $user = $this->userService->findbyEmail($data['email']);
+
+    if ($user !== null && !$user->getVerified()) {
+      $expired = $user->getVerificationTokenExpireAt() < new DateTimeImmutable();
+      $token = $expired ? $this->userService->generateVerificationToken($user->getId()) : $user->getVerificationToken();
+
+      $this->mailSender->send($user->getEmail(), $user->getUsername(), "Email verification", "Click here to verify your email: http://localhost:3000/authentification?token=" . $token);
+
+      $response->getBody()->write(json_encode("Verify your mailbox for the verification link"));
+      return $response;
+    }
+
+    throw new HttpNotFoundException($request, "this Email address does not exist");
   }
 
   public function signIn(Request $request, Response $response): Response
@@ -251,7 +256,7 @@ class UserController
     $resetToken = $this->userService->generateResetToken($user->getId());
 
     // send mail with reset link
-    $resetLink = join(["https://www.tyjuinfosport.com/recuperation-mot-de-passe?token=", $resetToken]);
+    $resetLink = join(["http://localhost:3000/authentification?token=", $resetToken]);
     $this->mailSender->send($user->getEmail(), $user->getUsername(), "Password Reset Request", join(["Click here to reset your password: ", $resetLink]));
     // send verification mail
     $response->getBody()->write(json_encode($user));
@@ -272,17 +277,17 @@ class UserController
       return $response;
     }
 
-    throw new HttpNotFoundException($request, "Token not valid");
+    throw new HttpBadRequestException($request, "Token not valid");
   }
 
   public function verifyEmail(Request $request, Response $response, string $token): Response
   {
-    $user = $this->userService->validateResetToken($token);
+    $user = $this->userService->validateVerificationToken($token);
     if ($user === null) {
       throw new HttpNotFoundException($request, "No Token Found");
     }
 
-    if ($user->getVerificationToken() !== null && new DateTimeImmutable() < $user->getResetTokenExpireAt()) {
+    if ($user->getVerificationToken() !== null && new DateTimeImmutable() < $user->getVerificationTokenExpireAt()) {
       $this->userService->verifyEmail($user);
       $response->getBody()->write(json_encode(['message' => 'Token is valid', 'user' => $user]));
       return $response;
