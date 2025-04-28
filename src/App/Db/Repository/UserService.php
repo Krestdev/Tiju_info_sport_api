@@ -127,6 +127,7 @@ final class UserService
   public function verifyEmail(UserSchema $user): ?UserSchema
   {
     $user->clearVerificationToken();
+    $user->setVerified(true);
     $this->em->persist($user);
     $this->em->flush();
     $this->em->refresh($user);
