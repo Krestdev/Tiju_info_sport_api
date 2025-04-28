@@ -89,7 +89,7 @@ class UserController
     $resetToken = $this->userService->generateVerificationToken($user->getId());
 
     // send verification mail
-    $resetLink = join(["http://localhost:3000/authentification?token=", $resetToken]);
+    $resetLink = join(["http://www.tyjuinfosport.com/authentification?token=", $resetToken]);
     $this->mailSender->send($user->getEmail(), $user->getUsername(), "Email verification", join(["Click here to verify your email: ", $resetLink]));
 
     $response->getBody()->write(json_encode($user));
@@ -122,7 +122,7 @@ class UserController
 
     // send verification mail
 
-    $resetLink = join(["http://localhost:3000/authentification?token=", $resetToken]);
+    $resetLink = join(["http://www.tyjuinfosport.com/authentification?token=", $resetToken]);
     $this->mailSender->send($user->getEmail(), $user->getUsername(), "Email verification", join(["Click here to verify your email: ", $resetLink]));
 
     $response->getBody()->write(json_encode($user));
@@ -138,7 +138,7 @@ class UserController
       $expired = $user->getVerificationTokenExpireAt() < new DateTimeImmutable();
       $token = $expired ? $this->userService->generateVerificationToken($user->getId()) : $user->getVerificationToken();
 
-      $this->mailSender->send($user->getEmail(), $user->getUsername(), "Email verification", "Click here to verify your email: http://localhost:3000/authentification?token=" . $token);
+      $this->mailSender->send($user->getEmail(), $user->getUsername(), "Email verification", "Click here to verify your email: http://www.tyjuinfosport.com/authentification?token=" . $token);
 
       $response->getBody()->write(json_encode("Verify your mailbox for the verification link"));
       return $response;
@@ -256,7 +256,7 @@ class UserController
     $resetToken = $this->userService->generateResetToken($user->getId());
 
     // send mail with reset link
-    $resetLink = join(["http://localhost:3000/authentification?token=", $resetToken]);
+    $resetLink = join(["http://www.tyjuinfosport.com/authentification?token=", $resetToken]);
     $this->mailSender->send($user->getEmail(), $user->getUsername(), "Password Reset Request", join(["Click here to reset your password: ", $resetLink]));
     // send verification mail
     $response->getBody()->write(json_encode($user));
