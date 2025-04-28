@@ -16,6 +16,8 @@ use Doctrine\ORM\Mapping\Table;
 use Google\Service\RapidMigrationAssessment\Collector;
 use JsonSerializable;
 
+use function PHPSTORM_META\type;
+
 #[Entity, Table(name: 'users')]
 class UserSchema implements JsonSerializable
 {
@@ -55,11 +57,24 @@ class UserSchema implements JsonSerializable
   #[Column(name: 'api_key_hash', type: 'string', length: 255, nullable: true)]
   private string|null $api_key_hash;
 
+  // reset password token
+
   #[Column(type: "string", length: 255, nullable: true)]
   private ?string $resetToken = null;
 
   #[Column(type: "datetimetz_immutable", nullable: true)]
   private ?DateTimeImmutable $resetTokenExpiresAt = null;
+
+  // verification token
+
+  #[Column(type: "string", length: 255, nullable: true)]
+  private ?string $verificationToken = null;
+
+  #[Column(type: "datetimetz_immutable", nullable: true)]
+  private ?DateTimeImmutable $verificationTokenExpiresAt = null;
+
+  #[Column(type: 'boolean', length: 255, nullable: true)]
+  private ?bool $verified;
 
   #[OneToOne(targetEntity: ImageSchema::class, inversedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
   private ?ImageSchema $profile = null;
@@ -155,6 +170,7 @@ class UserSchema implements JsonSerializable
     // }
     return [
       'id' => $this->id,
+      'verified' => $this->verified,
       'name' => $this->name,
       "nickName" => $this->nickName,
       'email' => $this->email,
@@ -312,10 +328,25 @@ class UserSchema implements JsonSerializable
     return $this->google_id;
   }
 
+  public function getVerified(): ?bool
+  {
+    return $this->verified;
+  }
+  public function setVerified(bool $verified): void
+  {
+    $this->verified = $verified;
+  }
+
   public function setResetToken(?string $token): void
   {
     $this->resetToken = $token;
     $this->resetTokenExpiresAt = new DateTimeImmutable('+1 hour'); // Token valid for 1 hour
+  }
+
+  public function setVerificationToken(?string $token): void
+  {
+    $this->verificationToken = $token;
+    $this->verificationTokenExpiresAt = new DateTimeImmutable('+1 hour'); // Token valid for 1 hour
   }
 
   public function getResetToken(): ?string
@@ -323,9 +354,19 @@ class UserSchema implements JsonSerializable
     return $this->resetToken;
   }
 
+  public function getVerificationToken(): ?string
+  {
+    return $this->verificationToken;
+  }
+
   public function getResetTokenExpireAt(): ?DateTimeImmutable
   {
     return $this->resetTokenExpiresAt;
+  }
+
+  public function getVerificationTokenExpireAt(): ?DateTimeImmutable
+  {
+    return $this->verificationTokenExpiresAt;
   }
 
 
@@ -334,10 +375,21 @@ class UserSchema implements JsonSerializable
     return $this->resetToken !== null && new DateTimeImmutable() < $this->resetTokenExpiresAt;
   }
 
+  public function isVerificationTokenValid(): bool
+  {
+    return $this->verificationToken !== null && new DateTimeImmutable() < $this->verificationTokenExpiresAt;
+  }
+
   public function clearResetToken(): void
   {
     $this->resetToken = null;
     $this->resetTokenExpiresAt = null;
+  }
+
+  public function clearVerificationToken(): void
+  {
+    $this->verificationToken = null;
+    $this->verificationTokenExpiresAt = null;
   }
 
   public function setProfile(?ImageSchema $profile): void

@@ -63,6 +63,13 @@ class UserController
 
     $user = $this->userService->findbyEmail($data['email']);
 
+    if ($user !== null && !$user->getVerified()) {
+      $expired = $user->getVerificationTokenExpireAt() < new DateTimeImmutable();
+      $token = $expired ? $this->userService->generateVerificationToken($user->getId()) : $user->getVerificationToken();
+
+      $this->mailSender->send($user->getEmail(), $user->getUsername(), "Email verification", "Click here to verify your email: https://www.tyjuinfosport.com/recuperation-mot-de-passe?token=" . $token);
+    }
+
     if ($user !== null) {
       throw new HttpNotFoundException($request, "email address taken");
     }
@@ -83,7 +90,14 @@ class UserController
     // }
 
     $user = $this->userService->signUp($data);
+
+    // Generate unique reset token
+    $resetToken = $this->userService->generateVerificationToken($user->getId());
+
     // send verification mail
+    $resetLink = join(["https://www.tyjuinfosport.com/recuperation-mot-de-passe?token=", $resetToken]);
+    $this->mailSender->send($user->getEmail(), $user->getUsername(), "Email verification", join(["Click here to verify your email: ", $resetLink]));
+
     $response->getBody()->write(json_encode($user));
     return $response;
   }
@@ -101,6 +115,13 @@ class UserController
 
     $user = $this->userService->findbyEmail($data['email']);
 
+    if ($user !== null && !$user->getVerified()) {
+      $expired = $user->getVerificationTokenExpireAt() < new DateTimeImmutable();
+      $token = $expired ? $this->userService->generateVerificationToken($user->getId()) : $user->getVerificationToken();
+
+      $this->mailSender->send($user->getEmail(), $user->getUsername(), "Email verification", "Click here to verify your email: https://www.tyjuinfosport.com/recuperation-mot-de-passe?token=" . $token);
+    }
+
     if ($user !== null) {
       throw new HttpNotFoundException($request, "email address taken");
     }
@@ -108,7 +129,15 @@ class UserController
     $data["password"] = password_hash($data["password"], PASSWORD_DEFAULT);
 
     $user = $this->userService->signUp($data);
+
+    // Generate unique reset token
+    $resetToken = $this->userService->generateVerificationToken($user->getId());
+
     // send verification mail
+
+    $resetLink = join(["https://www.tyjuinfosport.com/recuperation-mot-de-passe?token=", $resetToken]);
+    $this->mailSender->send($user->getEmail(), $user->getUsername(), "Email verification", join(["Click here to verify your email: ", $resetLink]));
+
     $response->getBody()->write(json_encode($user));
     return $response;
   }
@@ -222,7 +251,7 @@ class UserController
     $resetToken = $this->userService->generateResetToken($user->getId());
 
     // send mail with reset link
-    $resetLink = join(["http://localhost:3000/recuperation-mot-de-passe?token=", $resetToken]);
+    $resetLink = join(["https://www.tyjuinfosport.com/recuperation-mot-de-passe?token=", $resetToken]);
     $this->mailSender->send($user->getEmail(), $user->getUsername(), "Password Reset Request", join(["Click here to reset your password: ", $resetLink]));
     // send verification mail
     $response->getBody()->write(json_encode($user));
@@ -239,6 +268,24 @@ class UserController
     }
 
     if ($user->getResetToken() !== null && new DateTimeImmutable() < $user->getResetTokenExpireAt()) {
+      $response->getBody()->write(json_encode('Token is valid'));
+      return $response;
+    }
+
+    throw new HttpNotFoundException($request, "Token not valid");
+  }
+
+  public function validateVerificationToken(Request $request, Response $response): Response
+  {
+
+    $data = $request->getParsedBody();
+    $user = $this->userService->validateResetToken($data["token"]);
+    if ($user === null) {
+      throw new HttpNotFoundException($request, "No Token Found");
+    }
+
+    if ($user->getVerificationToken() !== null && new DateTimeImmutable() < $user->getResetTokenExpireAt()) {
+      $this->userService->verifyEmail($user);
       $response->getBody()->write(json_encode('Token is valid'));
       return $response;
     }

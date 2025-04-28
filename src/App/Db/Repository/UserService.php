@@ -89,6 +89,19 @@ final class UserService
     return $resetToken;
   }
 
+  public function generateVerificationToken(int $id): ?string
+  {
+    $user = $this->em->getRepository(UserSchema::class)->findOneBy(['id' => $id]);
+    $Token = bin2hex(random_bytes(32));
+    if ($user) {
+      $user->setVerificationToken($Token);
+      $this->em->persist($user);
+      $this->em->flush();
+      $this->em->refresh($user);
+    }
+    return $Token;
+  }
+
   public function resetPassword(UserSchema $user, string $password): ?UserSchema
   {
     // Hash the new password
@@ -106,6 +119,19 @@ final class UserService
     return $this->em->getRepository(UserSchema::class)->findOneBy(['resetToken' => $token]);
   }
 
+  public function validateVerificationToken(string $token): ?UserSchema
+  {
+    return $this->em->getRepository(UserSchema::class)->findOneBy(['verificationToken' => $token]);
+  }
+
+  public function verifyEmail(UserSchema $user): ?UserSchema
+  {
+    $user->clearVerificationToken();
+    $this->em->persist($user);
+    $this->em->flush();
+    $this->em->refresh($user);
+    return $user;
+  }
 
   public function findById(int $id): ?UserSchema
   {
