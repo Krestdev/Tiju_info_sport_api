@@ -22,7 +22,7 @@ class SendMail
 
     $this->mailSender->Username = $_ENV["SMTP_EMAIL"];
     $this->mailSender->Password = $_ENV["SMTP_PASSWORD"];
-    $this->mailSender->setFrom($_ENV["SMTP_EMAIL"], "Tiju Info Sport");
+    $this->mailSender->setFrom($_ENV["SMTP_EMAIL"], "Tyju Info Sport");
   }
 
   public function send(string $to, string $name, string $subject, string $body, bool $isHTML = false)
